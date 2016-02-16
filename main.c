@@ -1156,28 +1156,37 @@ void cpu_move(void)
 					}
 				}
 
-			if(target == NULL)
-				continue;
-
 			if ((currtime - player[i].ai_last_time) > 2 &&
 			    (currtime - player[i].ai_last_time) < 10)
 				nearest_distance = -1;
 
 			cur_posx = player[i].x >> 16;
 			cur_posy = player[i].y >> 16;
-			tar_posx = target->x >> 16;
-			tar_posy = target->y >> 16;
 
-			if (M_ABS(cur_posx - tar_posx) < 10 && nearest_distance > 0) {
-				player[i].ai_last = target_id;
-				player[i].ai_last_time = currtime;
+			if(target == NULL) {
+				tar_posx = (player[i].ai_following > 0) ? player[i].ai_following : cur_posx;
+				tar_posy = cur_posy;
+			} else {
+				tar_posx = target->x >> 16;
+				tar_posy = target->y >> 16;
+			}
+
+			if (M_ABS(cur_posx - tar_posx) < 20 &&
+			    nearest_distance > 0 &&
+			    target) {
+				if (player[i].ai_last == target_id &&
+				    (currtime - player[i].ai_last_time < 10)) {}
+				else {
+					player[i].ai_last = target_id;
+					player[i].ai_last_time = currtime;
+				}
 			}
 
 			/** nearest player found, get him */
 			/* here goes the artificial intelligence code */
 
 			if (nearest_distance > 0 &&
-			    nearest_distance < 10000000000000) {
+			    nearest_distance < 20000000000000) {
 
 			/* X-axis movement */
 			if(tar_posx > cur_posx)       // if true target is on the right side
@@ -1213,7 +1222,7 @@ void cpu_move(void)
 					regen = 1;
 
 				if (regen)
-					player[i].ai_following = rnd(320);
+					player[i].ai_following = rnd(352-32-8) + 16;
 
 				if (cur_posx < player[i].ai_following) {
 					lm = 0;
@@ -1225,12 +1234,7 @@ void cpu_move(void)
 			}
 
 			/* Y-axis movement */
-			if (map_tile(cur_posx, cur_posy) == BAN_WATER ||
-			    map_tile(cur_posx - 1, cur_posy) == BAN_WATER ||
-			    map_tile(cur_posx + 1, cur_posy) == BAN_WATER)
-				jm = rnd(10) <= 4;
-
-			else if(map_tile(cur_posx, cur_posy+16) != BAN_VOID &&
+			if(map_tile(cur_posx, cur_posy+16) != BAN_VOID &&
 				((i == 0 && key_pressed(KEY_PL1_JUMP)) ||
 				(i == 1 && key_pressed(KEY_PL2_JUMP)) ||
 				(i == 2 && key_pressed(KEY_PL3_JUMP)) ||
@@ -1242,10 +1246,15 @@ void cpu_move(void)
 				map_tile(cur_posx, cur_posy-8) != BAN_WATER)
 					jm=0;   // don't jump if there is something over it
 
+			else if (map_tile(cur_posx, cur_posy) == BAN_WATER ||
+			    map_tile(cur_posx - 8, cur_posy) == BAN_WATER ||
+			    map_tile(cur_posx + 8, cur_posy) == BAN_WATER)
+				jm = rnd(10) <= 4;
+
 			else if(map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_VOID &&
 				map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_WATER &&
 				cur_posx > 16 && cur_posx < 352-16-8)  // obstacle, jump
-				jm=rnd(10)<=6;   // if there is something on the way, jump over it
+				jm=1;   // if there is something on the way, jump over it
 
 			else if(((i == 0 && key_pressed(KEY_PL1_JUMP)) ||
 							(i == 1 && key_pressed(KEY_PL2_JUMP)) ||
