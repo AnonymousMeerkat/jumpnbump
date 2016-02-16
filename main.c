@@ -374,7 +374,7 @@ static void update_flies(int update_count)
 
 static void player_kill(int c1, int c2)
 {
-	if (player[c1].y_add >= 0) {
+	if (player[c1].y_add >= 0 || 1) {
 		if (is_server)
 			serverSendKillPacket(c1, c2);
 	} else {
@@ -1088,6 +1088,17 @@ static void player_action_down(int c1)
 
 	if (player[c1].down_time > 0 &&
 	    (currtime - player[c1].down_time) >= 2) {
+		for (int i = 0; i < JNB_MAX_PLAYERS; i++) {
+			if (i == c1 || !player[i].enabled)
+				continue;
+
+			if (labs(player[i].x - player[c1].x) <= (24L << 16) &&
+			    labs(player[i].y - player[c1].y) <= (24L << 16))
+			{
+				player_kill(c1, i);
+			}
+		}
+
 		player_kill(-1, c1);
 		player[c1].down_time = currtime;
 	} else if (player[c1].down_time < 0) {
@@ -1440,7 +1451,8 @@ void steer_players(void)
 				}
 				if (jetpack == 0) {
 					/* no jetpack */
-					if (pogostick == 1 || (player[c1].jump_ready == 1 && player[c1].action_up)) {
+					if ((pogostick == 1 || (player[c1].jump_ready == 1 && player[c1].action_up)) &&
+					    player[c1].anim != 6) {
 						s1 = (player[c1].x >> 16);
 						s2 = (player[c1].y >> 16);
 						if (s2 < -16)
@@ -1501,6 +1513,9 @@ void steer_players(void)
 							add_object(OBJ_SMOKE, (player[c1].x >> 16) + 6 + rnd(5), (player[c1].y >> 16) + 10 + rnd(5), 0, 16384 + rnd(8192), OBJ_ANIM_SMOKE, 0);
 					}
 				}
+
+				if (player[c1].anim == 6)
+					goto player_frame_tick;
 
 				player[c1].x += player[c1].x_add;
 				if ((player[c1].x >> 16) < 0) {
@@ -1658,6 +1673,7 @@ void steer_players(void)
 
 			}
 
+		player_frame_tick:
 			player[c1].frame_tick++;
 			if (player[c1].frame_tick >= player_anims[player[c1].anim].frame[player[c1].frame].ticks) {
 				player[c1].frame++;

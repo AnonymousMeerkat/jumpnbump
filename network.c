@@ -107,10 +107,12 @@ void processKillPacket(NetPacket *pkt)
 	int c4 = 0;
 	int s1 = 0;
 
-	player[c1].y_add = -player[c1].y_add;
-	if (player[c1].y_add > -262144L)
-		player[c1].y_add = -262144L;
-	player[c1].jump_abort = 1;
+        if (is_kill) {
+          player[c1].y_add = -player[c1].y_add;
+          if (player[c1].y_add > -262144L)
+            player[c1].y_add = -262144L;
+          player[c1].jump_abort = 1;
+        }
 	player[c2].dead_flag = 1;
 	if (player[c2].anim != 6) {
 		player[c2].anim = 6;
