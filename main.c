@@ -2422,6 +2422,8 @@ int init_program(int argc, char *argv[], char *pal)
 
 	memset(&main_info, 0, sizeof(main_info));
 
+	main_info.moregore = 1;
+
 	strcpy(datfile_name, DATA_PATH);
 
 	if (argc > 1) {
@@ -2432,6 +2434,8 @@ int init_program(int argc, char *argv[], char *pal)
 				main_info.music_no_sound = 1;
 			else if (stricmp(argv[c1], "-nogore") == 0)
 				main_info.no_gore = 1;
+			else if (stricmp(argv[c1], "-moregore") == 0)
+				main_info.moregore++;
 			else if (stricmp(argv[c1], "-noflies") == 0)
 				flies_enabled = 0;
 			else if (stricmp(argv[c1], "-nojoy") == 0)
@@ -2495,6 +2499,7 @@ int init_program(int argc, char *argv[], char *pal)
 				printf("  -fullscreen              run in fullscreen mode\n");
 				printf("  -nosound                 play without sound\n");
 				printf("  -nogore                  play without blood\n");
+				printf("  -moregore                play with more blood\n");
 				printf("  -noflies                 disable flies\n");
 				printf("  -mirror                  play with mirrored level\n");
 				printf("  -scaleup                 play with doubled resolution (800x512)\n");
