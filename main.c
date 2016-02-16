@@ -386,23 +386,110 @@ static void player_kill(int c1, int c2)
 
 static void check_cheats(void)
 {
-	if (strncmp(last_keys, "kcitsogop", strlen("kcitsogop")) == 0) {
+	const char cc_pogostick[] = {
+		SDL_SCANCODE_K,
+		SDL_SCANCODE_C,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_G,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_P,
+		0
+	};
+
+	const char cc_bunniesinspace[] = {
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_C,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_P,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_N,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_N,
+		SDL_SCANCODE_N,
+		SDL_SCANCODE_U,
+		SDL_SCANCODE_B,
+		0
+	};
+
+	const char cc_jetpack[] = {
+		SDL_SCANCODE_K,
+		SDL_SCANCODE_C,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_P,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_J,
+		0
+	};
+
+	const char cc_lordoftheflies[] = {
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_L,
+		SDL_SCANCODE_F,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_H,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_F,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_D,
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_L,
+		0
+	};
+
+	const char cc_bloodisthickerthanwater[] = {
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_W,
+		SDL_SCANCODE_N,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_H,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_K,
+		SDL_SCANCODE_C,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_H,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_D,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_L,
+		SDL_SCANCODE_B,
+		0
+	};
+
+	if (strncmp(last_keys, cc_pogostick, strlen(cc_pogostick)) == 0) {
 		pogostick ^= 1;
 		last_keys[0] = 0;
 	}
-	if (strncmp(last_keys, "ecapsniseinnub", strlen("ecapsniseinnub")) == 0) {
+	if (strncmp(last_keys, cc_bunniesinspace, strlen(cc_bunniesinspace)) == 0) {
 		bunnies_in_space ^= 1;
 		last_keys[0] = 0;
 	}
-	if (strncmp(last_keys, "kcaptej", strlen("kcaptej")) == 0) {
+	if (strncmp(last_keys, cc_jetpack, strlen(cc_jetpack)) == 0) {
 		jetpack ^= 1;
 		last_keys[0] = 0;
 	}
-	if (strncmp(last_keys, "seilfehtfodrol", strlen("seilfehtfodrol")) == 0) {
+	if (strncmp(last_keys, cc_lordoftheflies, strlen(cc_lordoftheflies)) == 0) {
 		lord_of_the_flies ^= 1;
 		last_keys[0] = 0;
 	}
-	if (strncmp(last_keys, "retawnahtrekcihtsidoolb", strlen("retawnahtrekcihtsidoolb")) == 0) {
+	if (strncmp(last_keys, cc_bloodisthickerthanwater, strlen(cc_bloodisthickerthanwater)) == 0) {
 		char blood[32] = {
 			63,32,32,53,17,17,42, 7,
 			 7,28, 0, 0,24, 0, 0,19,
