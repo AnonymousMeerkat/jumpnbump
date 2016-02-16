@@ -233,7 +233,11 @@ struct {
 	} page[2];
 } leftovers;
 
-int pogostick, bunnies_in_space, jetpack, lord_of_the_flies, blood_is_thicker_than_water;
+int pogostick, bunnies_in_space, jetpack, lord_of_the_flies, water_state;
+
+#define WATER_STATE_WATER 0
+#define WATER_STATE_BLOOD 1
+#define WATER_STATE_LAVA 2
 
 int client_player_num = -1;
 
@@ -384,6 +388,29 @@ static void player_kill(int c1, int c2)
 }
 
 
+char water_palette[32] = {
+	63, 63, 63,
+	40, 53, 62,
+	19, 42, 60,
+	 0, 33, 60,
+	 3, 32, 46,
+	 3, 26, 33,
+	 3, 19, 21,
+	 1,  8,  8
+};
+
+static void update_liquid(char* palette)
+{
+	int i;
+
+	for (i = 0; i < 32; i++)
+		pal[432 + i] = palette[i];
+
+	register_background(background_pic, pal);
+	recalculate_gob(&object_gobs, pal);
+}
+
+
 static void check_cheats(void)
 {
 	const char cc_pogostick[] = {
@@ -473,45 +500,82 @@ static void check_cheats(void)
 		0
 	};
 
+	const char cc_lavaishotterthanwater[] = {
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_W,
+		SDL_SCANCODE_N,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_H,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_R,
+		SDL_SCANCODE_E,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_T,
+		SDL_SCANCODE_O,
+		SDL_SCANCODE_H,
+		SDL_SCANCODE_S,
+		SDL_SCANCODE_I,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_V,
+		SDL_SCANCODE_A,
+		SDL_SCANCODE_L,
+		0
+	};
+
 	if (strncmp(last_keys, cc_pogostick, strlen(cc_pogostick)) == 0) {
 		pogostick ^= 1;
 		last_keys[0] = 0;
-	}
-	if (strncmp(last_keys, cc_bunniesinspace, strlen(cc_bunniesinspace)) == 0) {
+	} else if (strncmp(last_keys, cc_bunniesinspace, strlen(cc_bunniesinspace)) == 0) {
 		bunnies_in_space ^= 1;
 		last_keys[0] = 0;
-	}
-	if (strncmp(last_keys, cc_jetpack, strlen(cc_jetpack)) == 0) {
+	} else if (strncmp(last_keys, cc_jetpack, strlen(cc_jetpack)) == 0) {
 		jetpack ^= 1;
 		last_keys[0] = 0;
-	}
-	if (strncmp(last_keys, cc_lordoftheflies, strlen(cc_lordoftheflies)) == 0) {
+	} else if (strncmp(last_keys, cc_lordoftheflies, strlen(cc_lordoftheflies)) == 0) {
 		lord_of_the_flies ^= 1;
 		last_keys[0] = 0;
-	}
-	if (strncmp(last_keys, cc_bloodisthickerthanwater, strlen(cc_bloodisthickerthanwater)) == 0) {
+	} else if (strncmp(last_keys, cc_bloodisthickerthanwater, strlen(cc_bloodisthickerthanwater)) == 0) {
 		char blood[32] = {
-			63,32,32,53,17,17,42, 7,
-			 7,28, 0, 0,24, 0, 0,19,
-			 0, 0,12, 0, 0, 7, 0, 0
+			63, 32, 32,
+			53, 17, 17,
+			42,  7,  7,
+			28,  0,  0,
+			24,  0,  0,
+			19,  0,  0,
+			12,  0,  0,
+			 7,  0,  0
 		};
-		char water[32] = {
-			63,63,63,40,53,62,19,42,
-			60, 0,33,60, 3,32,46, 3,
-			26,33, 3,19,21, 1, 8, 8
-		};
-		int i;
 
-		blood_is_thicker_than_water ^= 1;
-		if (blood_is_thicker_than_water == 1) {
-			for (i=0; i<32; i++)
-				pal[432+i] = blood[i];
+		if (water_state != WATER_STATE_BLOOD) {
+			update_liquid(blood);
+			water_state = WATER_STATE_BLOOD;
 		} else {
-			for (i=0; i<32; i++)
-				pal[432+i] = water[i];
+			update_liquid(water_palette);
+			water_state = WATER_STATE_WATER;
 		}
-		register_background(background_pic, pal);
-		recalculate_gob(&object_gobs, pal);
+		last_keys[0] = 0;
+	} else if (strncmp(last_keys, cc_lavaishotterthanwater, strlen(cc_lavaishotterthanwater)) == 0) {
+		char lava[32] = {
+			63, 32, 32,
+			53, 17, 17,
+			50,  7,	 7,
+			48,  0,  0,
+			44,  0,  0,
+			39,  0,  0,
+			32,  0,  0,
+			27,  0,  0
+		};
+
+		if (water_state != WATER_STATE_LAVA) {
+			update_liquid(lava);
+			water_state = WATER_STATE_LAVA;
+		} else {
+			update_liquid(water_palette);
+			water_state = WATER_STATE_BLOOD;
+		}
 		last_keys[0] = 0;
 	}
 }
@@ -840,7 +904,7 @@ static int menu_loop(void)
 
 		dj_set_nosound(0);
 
-		lord_of_the_flies = bunnies_in_space = jetpack = pogostick = blood_is_thicker_than_water = 0;
+		lord_of_the_flies = bunnies_in_space = jetpack = pogostick = water_state = 0;
 		main_info.page_info[0].num_pobs = 0;
 		main_info.page_info[1].num_pobs = 0;
 		main_info.view_page = 0;
@@ -1609,36 +1673,42 @@ void steer_players(void)
 				if (s2 < 0)
 					s2 = 0;
 				if (GET_BAN_MAP_XY((s1 + 8), (s2 + 8)) == BAN_WATER) {
-					if (player[c1].in_water == 0) {
-						/* falling into water */
-						player[c1].in_water = 1;
-						player[c1].anim = 4;
-						player[c1].frame = 0;
-						player[c1].frame_tick = 0;
-						player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image + player[c1].direction * 9;
-						if (player[c1].y_add >= 32768) {
-							add_object(OBJ_SPLASH, (player[c1].x >> 16) + 8, ((player[c1].y >> 16) & 0xfff0) + 15, 0, 0, OBJ_ANIM_SPLASH, 0);
-							if (blood_is_thicker_than_water == 0)
-								dj_play_sfx(SFX_SPLASH, (unsigned short)(SFX_SPLASH_FREQ + rnd(2000) - 1000), 64, 0, 0, -1);
-							else
-								dj_play_sfx(SFX_SPLASH, (unsigned short)(SFX_SPLASH_FREQ + rnd(2000) - 5000), 64, 0, 0, -1);
+					if (water_state == WATER_STATE_LAVA) {
+						/* kill the player */
+						player_kill(-1, c1);
+						goto player_frame_tick;
+					} else {
+						if (player[c1].in_water == 0) {
+							/* falling into water */
+							player[c1].in_water = 1;
+							player[c1].anim = 4;
+							player[c1].frame = 0;
+							player[c1].frame_tick = 0;
+							player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image + player[c1].direction * 9;
+							if (player[c1].y_add >= 32768) {
+								add_object(OBJ_SPLASH, (player[c1].x >> 16) + 8, ((player[c1].y >> 16) & 0xfff0) + 15, 0, 0, OBJ_ANIM_SPLASH, 0);
+								if (water_state == WATER_STATE_WATER)
+									dj_play_sfx(SFX_SPLASH, (unsigned short)(SFX_SPLASH_FREQ + rnd(2000) - 1000), 64, 0, 0, -1);
+								else
+									dj_play_sfx(SFX_SPLASH, (unsigned short)(SFX_SPLASH_FREQ + rnd(2000) - 5000), 64, 0, 0, -1);
+							}
 						}
-					}
-					/* slowly move up to water surface */
-					player[c1].y_add -= 1536;
-					if (player[c1].y_add < 0 && player[c1].anim != 5) {
-						player[c1].anim = 5;
-						player[c1].frame = 0;
-						player[c1].frame_tick = 0;
-						player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image + player[c1].direction * 9;
-					}
-					if (player[c1].y_add < -65536L)
-						player[c1].y_add = -65536L;
-					if (player[c1].y_add > 65535L)
-						player[c1].y_add = 65535L;
-					if (GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_ICE || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_ICE) {
-						player[c1].y = (((s2 + 16) & 0xfff0) - 16) << 16;
-						player[c1].y_add = 0;
+						/* slowly move up to water surface */
+						player[c1].y_add -= 1536;
+						if (player[c1].y_add < 0 && player[c1].anim != 5) {
+							player[c1].anim = 5;
+							player[c1].frame = 0;
+							player[c1].frame_tick = 0;
+							player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image + player[c1].direction * 9;
+						}
+						if (player[c1].y_add < -65536L)
+							player[c1].y_add = -65536L;
+						if (player[c1].y_add > 65535L)
+							player[c1].y_add = 65535L;
+						if (GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_ICE || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_ICE) {
+							player[c1].y = (((s2 + 16) & 0xfff0) - 16) << 16;
+							player[c1].y_add = 0;
+						}
 					}
 				} else if (GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_ICE || GET_BAN_MAP_XY(s1, (s2 + 15)) == BAN_SPRING || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_SOLID || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_ICE || GET_BAN_MAP_XY((s1 + 15), (s2 + 15)) == BAN_SPRING) {
 					player[c1].in_water = 0;

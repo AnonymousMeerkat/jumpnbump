@@ -1,0 +1,11 @@
+*.o
+*.a
+*.exe
+*~
+jumpnbump
+jnppack
+jnbunpack
+jumpbump.dat
+*.gob
+jnbmenu.tcl
+globals.h
