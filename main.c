@@ -87,7 +87,7 @@ unsigned int ban_map[17][22] = {
 	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
 
-#define GET_BAN_MAP_XY(x,y) ban_map[(y) >> 4][(x) >> 4]
+#define GET_BAN_MAP_XY(x,y) (((y) < 0) ? 0 : (ban_map[(y) >> 4][(x) >> 4]))
 
 struct {
 	int num_frames;
@@ -1295,7 +1295,11 @@ void cpu_move(void)
 }
 
 
-#define GET_BAN_MAP_IN_WATER(s1, s2) (GET_BAN_MAP_XY((s1), ((s2) + 7)) == BAN_VOID || GET_BAN_MAP_XY(((s1) + 15), ((s2) + 7)) == BAN_VOID) && (GET_BAN_MAP_XY((s1), ((s2) + 8)) == BAN_WATER || GET_BAN_MAP_XY(((s1) + 15), ((s2) + 8)) == BAN_WATER)
+#define GET_BAN_MAP_IN_WATER(s1, s2) (					 \
+		(GET_BAN_MAP_XY((s1), ((s2) + 7)) == BAN_VOID ||	 \
+		 GET_BAN_MAP_XY(((s1) + 15), ((s2) + 7)) == BAN_VOID) && \
+		(GET_BAN_MAP_XY((s1), ((s2) + 8)) == BAN_WATER ||	 \
+		 GET_BAN_MAP_XY(((s1) + 15), ((s2) + 8)) == BAN_WATER))
 
 
 void steer_players(void)

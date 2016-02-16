@@ -1,6 +1,6 @@
 SDL_CFLAGS = `sdl2-config --cflags`
 SDL_LIBS = `sdl2-config --libs`
-CFLAGS = -Wall -O2 -ffast-math -funroll-loops -Dstricmp=strcasecmp \
+CFLAGS = -Wall -O2 -g -ffast-math -funroll-loops -Dstricmp=strcasecmp \
 	-Dstrnicmp=strncasecmp -DUSE_SDL -DNDEBUG -I. $(SDL_CFLAGS) \
 	-DUSE_NET -DZLIB_SUPPORT -DBZLIB_SUPPORT
 LIBS = -lm $(SDL_LIBS) -lSDL2_mixer -lSDL2_net -lbz2 -lz
