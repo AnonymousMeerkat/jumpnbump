@@ -1095,14 +1095,18 @@ tile = ban_map[pos_y][pos_x];
 return tile;
 }
 
+#define M_ABS(x) (((x) < 0) ? (-(x)) : (x))
 void cpu_move(void)
 {
 	int lm, rm, jm;
 	int i, j;
 	int cur_posx, cur_posy, tar_posx, tar_posy;
-	int players_distance;
+	long long deltax, deltay;
+	long long players_distance;
 	player_t* target = NULL;
-	int nearest_distance = -1;
+	int target_id = -1;
+	long long nearest_distance = -1;
+	int currtime = time(NULL);
 
 	for (i = 0; i < JNB_MAX_PLAYERS; i++)
 		{
@@ -1111,18 +1115,26 @@ void cpu_move(void)
 			{		// get nearest target
 			for (j = 0; j < JNB_MAX_PLAYERS; j++)
 				{
-				int deltax, deltay;
-
 				if(i == j || !player[j].enabled)
 					continue;
 
-				deltax = player[j].x - player[i].x;
-				deltay = player[j].y - player[i].y;
-				players_distance = deltax*deltax + deltay*deltay;
+				if (player[i].ai_last == j &&
+				    (currtime - player[i].ai_last_time) > 2 &&
+				    (currtime - player[i].ai_last_time) < 10)
+					continue;
 
-				if (players_distance < nearest_distance || nearest_distance == -1)
+				deltax = player[j].x - player[i].x;
+				if (deltax < 0)
+					deltax = -deltax;
+				deltay = player[j].y - player[i].y;
+				if (deltay < 0)
+					deltay = -deltay;
+				players_distance = deltax*deltax + deltay*deltay*2;
+
+				if (((players_distance < nearest_distance) && rnd(10) <= 7) || nearest_distance == -1)
 					{
 					target = &player[j];
+					target_id = j;
 					nearest_distance = players_distance;
 					}
 				}
@@ -1130,13 +1142,25 @@ void cpu_move(void)
 			if(target == NULL)
 				continue;
 
+			if ((currtime - player[i].ai_last_time) > 2 &&
+			    (currtime - player[i].ai_last_time) < 10)
+				nearest_distance = -1;
+
 			cur_posx = player[i].x >> 16;
 			cur_posy = player[i].y >> 16;
 			tar_posx = target->x >> 16;
 			tar_posy = target->y >> 16;
 
+			if (M_ABS(cur_posx - tar_posx) < 10 && nearest_distance > 0) {
+				player[i].ai_last = target_id;
+				player[i].ai_last_time = currtime;
+			}
+
 			/** nearest player found, get him */
 			/* here goes the artificial intelligence code */
+
+			if (nearest_distance > 0 &&
+			    nearest_distance < 10000000000000) {
 
 			/* X-axis movement */
 			if(tar_posx > cur_posx)       // if true target is on the right side
@@ -1159,8 +1183,29 @@ void cpu_move(void)
 			else if(tar_posx - cur_posx < 4+8 && tar_posx - cur_posx > -4)
 				{      // makes the bunnies less "nervous"
 				lm=0;
-				lm=0;
+				rm=0;
 				}
+
+			} else {
+				int regen = 0;
+				if (player[i].ai_following == -1 ||
+				    cur_posx == player[i].ai_following)
+					regen = 1;
+
+				if (rnd(200) == 1)
+					regen = 1;
+
+				if (regen)
+					player[i].ai_following = rnd(320);
+
+				if (cur_posx < player[i].ai_following) {
+					lm = 0;
+					rm = 1;
+				} else {
+					lm = 1;
+					rm = 0;
+				}
+			}
 
 			/* Y-axis movement */
 			if(map_tile(cur_posx, cur_posy+16) != BAN_VOID &&
@@ -1175,10 +1220,15 @@ void cpu_move(void)
 				map_tile(cur_posx, cur_posy-8) != BAN_WATER)
 					jm=0;   // don't jump if there is something over it
 
+			else if (map_tile(cur_posx, cur_posy) == BAN_WATER ||
+				 map_tile(cur_posx - 1, cur_posy) == BAN_WATER ||
+				 map_tile(cur_posx + 1, cur_posy) == BAN_WATER)
+				jm = rnd(10) <= 4;
+
 			else if(map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_VOID &&
 				map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_WATER &&
 				cur_posx > 16 && cur_posx < 352-16-8)  // obstacle, jump
-					jm=1;   // if there is something on the way, jump over it
+				jm=rnd(10)<=6;   // if there is something on the way, jump over it
 
 			else if(((i == 0 && key_pressed(KEY_PL1_JUMP)) ||
 							(i == 1 && key_pressed(KEY_PL2_JUMP)) ||
@@ -1186,14 +1236,14 @@ void cpu_move(void)
 							(i == 3 && key_pressed(KEY_PL4_JUMP))) &&
 							(map_tile(cur_posx-(lm*8)+(rm*16), cur_posy+8) != BAN_VOID &&
 							map_tile(cur_posx-(lm*8)+(rm*16), cur_posy+8) != BAN_WATER))
-					jm=1;   // this makes it possible to jump over 2 tiles
+				jm=1;   // this makes it possible to jump over 2 tiles
 
 			else if(cur_posy - tar_posy < 32 && cur_posy - tar_posy > 0 &&
               tar_posx - cur_posx < 32+8 && tar_posx - cur_posx > -32)  // don't jump - running away
 				jm=0;
 
 			else if(tar_posy <= cur_posy)   // target on the upper side
-				jm=1;
+				jm=rnd(10)<=6;
 			else   // target below
 				jm=0;
 
@@ -2134,6 +2184,9 @@ int init_level(int level, char *pal)
 	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 		if (player[c1].enabled == 1) {
 			player[c1].bumps = 0;
+			player[c1].ai_following = -1;
+			player[c1].ai_last = -1;
+			player[c1].ai_last_time = -1;
 			for (c2 = 0; c2 < JNB_MAX_PLAYERS; c2++)
 				player[c1].bumped[c2] = 0;
 			position_player(c1);

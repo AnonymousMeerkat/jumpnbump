@@ -210,6 +210,7 @@ typedef struct {
 	int x_add, y_add;
 	int direction, jump_ready, jump_abort, in_water;
 	int anim, frame, frame_tick, image;
+	int ai_following, ai_last, ai_last_time;
 } player_t;
 
 typedef struct {
