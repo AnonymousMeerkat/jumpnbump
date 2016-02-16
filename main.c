@@ -1087,9 +1087,8 @@ static void player_action_down(int c1)
 	int currtime = time(NULL);
 
 	if (player[c1].down_time > 0 &&
-	    (currtime - player[c1].down_time) >= 2)
-	{
-		player_kill(c1, c1);
+	    (currtime - player[c1].down_time) >= 2) {
+		player_kill(-1, c1);
 		player[c1].down_time = currtime;
 	} else if (player[c1].down_time < 0) {
 		player[c1].down_time = currtime;

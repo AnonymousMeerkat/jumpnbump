@@ -94,7 +94,13 @@ void serverSendKillPacket(int killer, int victim)
 
 void processKillPacket(NetPacket *pkt)
 {
-	int c1 = pkt->arg;
+	int is_kill = pkt->arg >= 0;
+        int c1;
+        if (is_kill) {
+          c1 = pkt->arg;
+        } else {
+          c1 = pkt->arg2;
+        }
 	int c2 = pkt->arg2;
 	int x = pkt->arg3;
 	int y = pkt->arg4;
@@ -124,8 +130,10 @@ void processKillPacket(NetPacket *pkt)
 				add_object(OBJ_FLESH, (x >> 16) + 6 + rnd(5), (y >> 16) + 6 + rnd(5), (rnd(65535) - 32768) * 3, (rnd(65535) - 32768) * 3, 0, 79);
 		}
 		dj_play_sfx(SFX_DEATH, (unsigned short)(SFX_DEATH_FREQ + rnd(2000) - 1000), 64, 0, 0, -1);
-		player[c1].bumps++;
-		player[c1].bumped[c2]++;
+                if (is_kill) {
+                  player[c1].bumps++;
+                  player[c1].bumped[c2]++;
+                }
 		s1 = player[c1].bumps % 100;
 		add_leftovers(0, 360, 34 + c1 * 64, s1 / 10, &number_gobs);
 		add_leftovers(1, 360, 34 + c1 * 64, s1 / 10, &number_gobs);
