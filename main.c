@@ -1081,6 +1081,23 @@ static void player_action_right(int c1)
     }
 }
 
+
+static void player_action_down(int c1)
+{
+	int currtime = time(NULL);
+
+	if (player[c1].down_time > 0 &&
+	    (currtime - player[c1].down_time) >= 2)
+	{
+		player_kill(c1, c1);
+		player[c1].down_time = currtime;
+	} else if (player[c1].down_time < 0) {
+		player[c1].down_time = currtime;
+	}
+
+
+}
+
 int map_tile(int pos_x, int pos_y)
 {
 int tile;
@@ -1208,7 +1225,12 @@ void cpu_move(void)
 			}
 
 			/* Y-axis movement */
-			if(map_tile(cur_posx, cur_posy+16) != BAN_VOID &&
+			if (map_tile(cur_posx, cur_posy) == BAN_WATER ||
+			    map_tile(cur_posx - 1, cur_posy) == BAN_WATER ||
+			    map_tile(cur_posx + 1, cur_posy) == BAN_WATER)
+				jm = rnd(10) <= 4;
+
+			else if(map_tile(cur_posx, cur_posy+16) != BAN_VOID &&
 				((i == 0 && key_pressed(KEY_PL1_JUMP)) ||
 				(i == 1 && key_pressed(KEY_PL2_JUMP)) ||
 				(i == 2 && key_pressed(KEY_PL3_JUMP)) ||
@@ -1219,11 +1241,6 @@ void cpu_move(void)
 			else if(map_tile(cur_posx, cur_posy-8) != BAN_VOID &&
 				map_tile(cur_posx, cur_posy-8) != BAN_WATER)
 					jm=0;   // don't jump if there is something over it
-
-			else if (map_tile(cur_posx, cur_posy) == BAN_WATER ||
-				 map_tile(cur_posx - 1, cur_posy) == BAN_WATER ||
-				 map_tile(cur_posx + 1, cur_posy) == BAN_WATER)
-				jm = rnd(10) <= 4;
 
 			else if(map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_VOID &&
 				map_tile(cur_posx-(lm*8)+(rm*16), cur_posy) != BAN_WATER &&
@@ -1366,6 +1383,11 @@ void steer_players(void)
 
 			if (player[c1].dead_flag == 0) {
 
+				if (player[c1].action_down) {
+					player_action_down(c1);
+				} else {
+					player[c1].down_time = -1;
+				}
 				if (player[c1].action_left && player[c1].action_right) {
 					if (player[c1].direction == 0) {
 						if (player[c1].action_right) {
@@ -1676,6 +1698,7 @@ void position_player(int player_num)
 			player[player_num].anim = 0;
 			player[player_num].frame = 0;
 			player[player_num].frame_tick = 0;
+			player[player_num].down_time = -1;
 			player[player_num].image = player_anims[player[player_num].anim].frame[player[player_num].frame].image;
 
 			if (is_server) {

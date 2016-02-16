@@ -1,7 +1,7 @@
 /*
  * input.c
  * Copyright (C) 1998 Brainchild Design - http://brainchilddesign.com/
- * 
+ *
  * Copyright (C) 2001 Chuck Mason <cemason@users.sourceforge.net>
  *
  * Copyright (C) 2002 Florian Schulze <crow@icculus.org>
@@ -53,6 +53,9 @@ void update_player_actions(void)
 		tmp = (key_pressed(KEY_PL1_JUMP) == 1) || JOY_JUMP(3);
 		if (tmp != player[0].action_up)
 			tellServerPlayerMoved(0, MOVEMENT_UP, tmp);
+                tmp = (key_pressed(KEY_PL1_DOWN) == 1);
+		if (tmp != player[0].action_down)
+			tellServerPlayerMoved(0, MOVEMENT_DOWN, tmp);
 
 		tmp = (key_pressed(KEY_PL2_LEFT) == 1) || JOY_LEFT(2);
 		if (tmp != player[1].action_left)
@@ -63,6 +66,9 @@ void update_player_actions(void)
 		tmp = (key_pressed(KEY_PL2_JUMP) == 1) || JOY_JUMP(2);
 		if (tmp != player[1].action_up)
 			tellServerPlayerMoved(1, MOVEMENT_UP, tmp);
+                tmp = (key_pressed(KEY_PL2_DOWN) == 1);
+		if (tmp != player[1].action_down)
+			tellServerPlayerMoved(1, MOVEMENT_DOWN, tmp);
 
 		tmp = (key_pressed(KEY_PL3_LEFT) == 1) || JOY_LEFT(1);
 		if (tmp != player[2].action_left)
@@ -73,16 +79,22 @@ void update_player_actions(void)
 		tmp = (key_pressed(KEY_PL3_JUMP) == 1) || JOY_JUMP(1);
 		if (tmp != player[2].action_up)
 			tellServerPlayerMoved(2, MOVEMENT_UP, tmp);
+                tmp = (key_pressed(KEY_PL3_DOWN) == 1);
+		if (tmp != player[2].action_down)
+			tellServerPlayerMoved(2, MOVEMENT_DOWN, tmp);
 
 		tmp = (key_pressed(KEY_PL4_LEFT) == 1) || JOY_LEFT(0);
 		if (tmp != player[3].action_left)
-		tellServerPlayerMoved(3, MOVEMENT_LEFT, tmp);
+			tellServerPlayerMoved(3, MOVEMENT_LEFT, tmp);
 		tmp = (key_pressed(KEY_PL4_RIGHT) == 1) || JOY_RIGHT(0);
 		if (tmp != player[3].action_right)
-		tellServerPlayerMoved(3, MOVEMENT_RIGHT, tmp);
+			tellServerPlayerMoved(3, MOVEMENT_RIGHT, tmp);
 		tmp = (key_pressed(KEY_PL4_JUMP) == 1) || JOY_JUMP(0);
 		if (tmp != player[3].action_up)
-		tellServerPlayerMoved(3, MOVEMENT_UP, tmp);
+                	tellServerPlayerMoved(3, MOVEMENT_UP, tmp);
+                tmp = (key_pressed(KEY_PL4_DOWN) == 1);
+		if (tmp != player[3].action_down)
+			tellServerPlayerMoved(3, MOVEMENT_DOWN, tmp);
 	} else {
 		tmp = (key_pressed(KEY_PL1_LEFT) == 1) || JOY_LEFT(0);
 		if (tmp != player[client_player_num].action_left)
@@ -93,6 +105,9 @@ void update_player_actions(void)
 		tmp = (key_pressed(KEY_PL1_JUMP) == 1) || JOY_JUMP(0);
 		if (tmp != player[client_player_num].action_up)
 			tellServerPlayerMoved(client_player_num, MOVEMENT_UP, tmp);
+                tmp = (key_pressed(KEY_PL1_DOWN) == 1);
+		if (tmp != player[client_player_num].action_down)
+			tellServerPlayerMoved(client_player_num, MOVEMENT_DOWN, tmp);
 	}
 }
 

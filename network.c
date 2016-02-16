@@ -44,6 +44,8 @@ void processMovePacket(NetPacket *pkt)
 		player[playerid].action_right = newval;
 	} else if (movetype == MOVEMENT_UP) {
 		player[playerid].action_up = newval;
+        } else if (movetype == MOVEMENT_DOWN) {
+		player[playerid].action_down = newval;
 	} else {
 		printf("bogus MOVE packet!\n");
 	}

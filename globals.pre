@@ -80,6 +80,7 @@ void tellServerPlayerMoved(int playerid, int movement_type, int newval);
 #define MOVEMENT_LEFT  1
 #define MOVEMENT_RIGHT 2
 #define MOVEMENT_UP    3
+#define MOVEMENT_DOWN  4
 
 #define JNB_VERSION "1.60"
 
@@ -104,15 +105,19 @@ extern int ai[JNB_MAX_PLAYERS];
 #define KEY_PL1_LEFT	SDL_SCANCODE_LEFT
 #define KEY_PL1_RIGHT	SDL_SCANCODE_RIGHT
 #define KEY_PL1_JUMP	SDL_SCANCODE_UP
+#define KEY_PL1_DOWN    SDL_SCANCODE_DOWN
 #define KEY_PL2_LEFT	SDL_SCANCODE_A
 #define KEY_PL2_RIGHT	SDL_SCANCODE_D
 #define KEY_PL2_JUMP	SDL_SCANCODE_W
+#define KEY_PL2_DOWN    SDL_SCANCODE_S
 #define KEY_PL3_LEFT	SDL_SCANCODE_J
 #define KEY_PL3_RIGHT	SDL_SCANCODE_L
 #define KEY_PL3_JUMP	SDL_SCANCODE_I
+#define KEY_PL3_DOWN    SDL_SCANCODE_K
 #define KEY_PL4_LEFT	SDL_SCANCODE_KP_4
 #define KEY_PL4_RIGHT	SDL_SCANCODE_KP_6
 #define KEY_PL4_JUMP	SDL_SCANCODE_KP_8
+#define KEY_PL4_DOWN    SDL_SCANCODE_KP_5
 #endif
 
 #define NUM_POBS 200
@@ -203,7 +208,8 @@ typedef struct {
 } main_info_t;
 
 typedef struct {
-	int action_left,action_up,action_right;
+	int action_left,action_up,action_right,action_down;
+        int down_time;
 	int enabled, dead_flag;
 	int bumps;
 	int bumped[JNB_MAX_PLAYERS];
