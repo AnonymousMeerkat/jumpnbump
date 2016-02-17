@@ -272,6 +272,14 @@ static void flip_pixels(unsigned char *pixels)
 }
 
 
+static int64_t get_millis()
+{
+	struct timespec time;
+	clock_gettime(CLOCK_MONOTONIC, &time);
+	return ((time.tv_sec * 1000000000) + time.tv_nsec) / 1000000;
+}
+
+
 void get_closest_player_to_point(int x,int y,int *dist,int *closest_player)
 {
 	int c1;
@@ -1173,10 +1181,10 @@ static void player_action_right(int c1)
 
 static void player_action_down(int c1)
 {
-	int currtime = time(NULL);
+	int currtime = get_millis();
 
 	if (player[c1].down_time > 0 &&
-	    (currtime - player[c1].down_time) >= 2) {
+	    (currtime - player[c1].down_time) >= 500) {
 		for (int i = 0; i < JNB_MAX_PLAYERS; i++) {
 			if (i == c1 || !player[i].enabled)
 				continue;
