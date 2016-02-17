@@ -1250,8 +1250,22 @@ void cpu_move(void)
 					{
 						target = &player[j];
 						target_id = j;
+						player[i].ai_target = target_id;
 						nearest_distance = players_distance;
 					}
+				}
+			} else {
+				target_id = player[i].ai_target;
+				if (target_id >= 0) {
+					target = &player[target_id];
+
+					deltax = player[target_id].x - player[i].x;
+					if (deltax < 0)
+						deltax = -deltax;
+					deltay = player[target_id].y - player[i].y;
+					if (deltay < 0)
+						deltay = -deltay;
+					nearest_distance = deltax*deltax + deltay*deltay*2;
 				}
 			}
 
@@ -1824,6 +1838,7 @@ void position_player(int player_num)
 			player[player_num].ai_following = -1;
 			player[player_num].ai_last = -1;
 			player[player_num].ai_last_time = -1;
+			player[player_num].ai_target = -1;
 			player[player_num].ai_target_time = -1;
 			player[player_num].image = player_anims[player[player_num].anim].frame[player[player_num].frame].image;
 
