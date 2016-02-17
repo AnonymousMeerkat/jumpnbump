@@ -1255,7 +1255,7 @@ ai_personality_t ai_personalities[4] = {
 	{ /* Mijji */
 		.select_target = 50,
 		.target_timeout = 0,
-		.suicide_distance = 5000000000000,
+		.suicide_distance = 3400000000000,
 		.nearest_distance = 1000000000000
 	}
 };
