@@ -16,7 +16,7 @@ PREFIX ?= /usr/local
 
 all: $(BINARIES)
 
-$(SDL_TARGET): globals.h
+$(SDL_TARGET): globals.h sdl/*
 	cd sdl && make
 
 $(MODIFY_TARGET): globals.h

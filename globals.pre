@@ -119,6 +119,7 @@ extern int ai[JNB_MAX_PLAYERS];
 #define KEY_PL4_JUMP	SDL_SCANCODE_KP_8
 #define KEY_PL4_DOWN    SDL_SCANCODE_KP_5
 #endif
+#define KEY_PAUSE       SDL_SCANCODE_P
 
 #define NUM_POBS 200
 #define NUM_OBJECTS 200

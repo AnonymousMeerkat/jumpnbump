@@ -655,6 +655,8 @@ static void collision_check(void)
 	}
 }
 
+
+extern int is_paused;
 static void game_loop(void) {
 	int mod_vol, sfx_vol;
 	int update_count = 1;
@@ -690,6 +692,9 @@ static void game_loop(void) {
 				memset(pal, 0, 768);
 				mod_fade_direction = 0;
 			}
+
+			if (is_paused)
+				break;
 
 			check_cheats();
 

@@ -44,6 +44,8 @@ char local_keyb[256];
 char keyb[256];
 char last_keys[50];
 
+char is_paused = 0;
+
 #ifdef USE_KAILLERA
 
 /* information about the party in this session */
@@ -414,6 +416,10 @@ int intr_sysupdate()
 						else
 							addkey(1 & 0x7f);
 						break;
+                                case KEY_PAUSE:
+                                        if (e.type == SDL_KEYDOWN)
+                                                is_paused = !is_paused;
+                                        break;
 					default:
 						e.key.keysym.scancode &= 0x7f;
 						if (e.type == SDL_KEYUP)
