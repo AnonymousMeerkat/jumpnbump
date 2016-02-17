@@ -1199,36 +1199,41 @@ void cpu_move(void)
 	long long nearest_distance = -1;
 	int currtime = time(NULL);
 
-	for (i = 0; i < JNB_MAX_PLAYERS; i++)
-		{
-	  nearest_distance = -1;
-		if(ai[i] && player[i].enabled)		// this player is a computer
-			{		// get nearest target
-			for (j = 0; j < JNB_MAX_PLAYERS; j++)
+	for (i = 0; i < JNB_MAX_PLAYERS; i++) {
+		nearest_distance = -1;
+		if (ai[i] && player[i].enabled) {		// this player is a computer
+
+			if ((currtime - player[i].ai_target_time) >= 1 ||
+			    player[i].ai_target_time < 0) {
+				player[i].ai_target_time = currtime;
+
+				// get nearest target
+				for (j = 0; j < JNB_MAX_PLAYERS; j++)
 				{
-				if(i == j || !player[j].enabled)
-					continue;
+					if(i == j || !player[j].enabled)
+						continue;
 
-				if (player[i].ai_last == j &&
-				    (currtime - player[i].ai_last_time) > 2 &&
-				    (currtime - player[i].ai_last_time) < 10)
-					continue;
+					if (player[i].ai_last == j &&
+					    (currtime - player[i].ai_last_time) > 2 &&
+					    (currtime - player[i].ai_last_time) < 10)
+						continue;
 
-				deltax = player[j].x - player[i].x;
-				if (deltax < 0)
-					deltax = -deltax;
-				deltay = player[j].y - player[i].y;
-				if (deltay < 0)
-					deltay = -deltay;
-				players_distance = deltax*deltax + deltay*deltay*2;
+					deltax = player[j].x - player[i].x;
+					if (deltax < 0)
+						deltax = -deltax;
+					deltay = player[j].y - player[i].y;
+					if (deltay < 0)
+						deltay = -deltay;
+					players_distance = deltax*deltax + deltay*deltay*2;
 
-				if (((players_distance < nearest_distance) && rnd(10) <= 7) || nearest_distance == -1)
+					if (((players_distance < nearest_distance) && rnd(10) <= 7) || nearest_distance == -1)
 					{
-					target = &player[j];
-					target_id = j;
-					nearest_distance = players_distance;
+						target = &player[j];
+						target_id = j;
+						nearest_distance = players_distance;
 					}
 				}
+			}
 
 			if ((currtime - player[i].ai_last_time) > 2 &&
 			    (currtime - player[i].ai_last_time) < 10)
@@ -1793,6 +1798,10 @@ void position_player(int player_num)
 			player[player_num].frame = 0;
 			player[player_num].frame_tick = 0;
 			player[player_num].down_time = -1;
+			player[player_num].ai_following = -1;
+			player[player_num].ai_last = -1;
+			player[player_num].ai_last_time = -1;
+			player[player_num].ai_target_time = -1;
 			player[player_num].image = player_anims[player[player_num].anim].frame[player[player_num].frame].image;
 
 			if (is_server) {
@@ -2301,9 +2310,6 @@ int init_level(int level, char *pal)
 	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 		if (player[c1].enabled == 1) {
 			player[c1].bumps = 0;
-			player[c1].ai_following = -1;
-			player[c1].ai_last = -1;
-			player[c1].ai_last_time = -1;
 			for (c2 = 0; c2 < JNB_MAX_PLAYERS; c2++)
 				player[c1].bumped[c2] = 0;
 			position_player(c1);
