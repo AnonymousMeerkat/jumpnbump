@@ -702,7 +702,7 @@ static void game_loop(void) {
 			}
 
 			if (is_paused)
-				break;
+				goto drawme;
 
 			check_cheats();
 
@@ -742,6 +742,7 @@ static void game_loop(void) {
 
 			dj_mix();
 
+		drawme:
 			if (update_count == 1) {
 				int c2;
 
