@@ -1223,6 +1223,7 @@ return tile;
 typedef struct {
 	int select_target;
 	int target_timeout;
+	long long suicide_distance;
 	long long nearest_distance;
 } ai_personality_t;
 
@@ -1236,21 +1237,25 @@ ai_personality_t ai_personalities[4] = {
 	{ /* Dott */
 		.select_target = 90,
 		.target_timeout = 6,
+		.suicide_distance = 100000000000, /* should never happen */
 		.nearest_distance = 100000000000000
 	},
         { /* Jiffy */
 		.select_target = 20,
 		.target_timeout = 1,
+		.suicide_distance = 1000000000000,
 		.nearest_distance = 5000000000000
 	},
 	{ /* Fizz */
 		.select_target = 70,
 		.target_timeout = 2,
+		.suicide_distance = 800000000000,
 		.nearest_distance = 20000000000000
 	},
 	{ /* Mijji */
 		.select_target = 50,
 		.target_timeout = 0,
+		.suicide_distance = 5000000000000,
 		.nearest_distance = 1000000000000
 	}
 };
@@ -1258,19 +1263,36 @@ ai_personality_t ai_personalities[4] = {
 #define M_ABS(x) (((x) < 0) ? (-(x)) : (x))
 void cpu_move(void)
 {
-	int lm, rm, jm;
+	int lm, rm, jm, dm = 0;
 	int i, j;
 	int cur_posx, cur_posy, tar_posx, tar_posy;
 	long long deltax, deltay;
 	long long players_distance;
 	player_t* target = NULL;
 	int target_id = -1;
-	long long nearest_distance = -1;
+	long long nearest_distance = -1, rnearest = -1;
 	int currtime = time(NULL);
 
 	for (i = 0; i < JNB_MAX_PLAYERS; i++) {
 		nearest_distance = -1;
 		if (ai[i] && player[i].enabled) {		// this player is a computer
+
+			for (j = 0; j < JNB_MAX_PLAYERS; j++)
+			{
+				if(i == j || !player[j].enabled)
+					continue;
+
+				deltax = player[j].x - player[i].x;
+				if (deltax < 0)
+					deltax = -deltax;
+				deltay = player[j].y - player[i].y;
+				if (deltay < 0)
+					deltay = -deltay;
+				players_distance = deltax*deltax + deltay*deltay;
+
+				if (players_distance < rnearest || rnearest == -1)
+					rnearest = players_distance;
+			}
 
 			if ((currtime - player[i].ai_target_time) >= ai_personalities[i].target_timeout ||
 			    player[i].ai_target_time < 0) {
@@ -1282,11 +1304,6 @@ void cpu_move(void)
 					if(i == j || !player[j].enabled)
 						continue;
 
-					if (player[i].ai_last == j &&
-					    (currtime - player[i].ai_last_time) > 2 &&
-					    (currtime - player[i].ai_last_time) < 10)
-						continue;
-
 					deltax = player[j].x - player[i].x;
 					if (deltax < 0)
 						deltax = -deltax;
@@ -1294,6 +1311,11 @@ void cpu_move(void)
 					if (deltay < 0)
 						deltay = -deltay;
 					players_distance = deltax*deltax + deltay*deltay*2;
+
+					if (player[i].ai_last == j &&
+					    (currtime - player[i].ai_last_time) > 2 &&
+					    (currtime - player[i].ai_last_time) < 10)
+						continue;
 
 					if (((players_distance < nearest_distance) &&
 					     rnd(100) <= ai_personalities[i].select_target) ||
@@ -1352,28 +1374,28 @@ void cpu_move(void)
 			if (nearest_distance > 0 &&
 			    nearest_distance < ai_personalities[i].nearest_distance) {
 
-			/* X-axis movement */
-			if(tar_posx > cur_posx)       // if true target is on the right side
+				/* X-axis movement */
+				if(tar_posx > cur_posx)       // if true target is on the right side
 				{    // go after him
-				lm=0;
-				rm=1;
+					lm=0;
+					rm=1;
 				}
-			else    // target on the left side
+				else    // target on the left side
 				{
-				lm=1;
-				rm=0;
+					lm=1;
+					rm=0;
 				}
 
-			if(cur_posy - tar_posy < 32 && cur_posy - tar_posy > 0 &&
-              tar_posx - cur_posx < 32+8 && tar_posx - cur_posx > -32)
+				if(cur_posy - tar_posy < 32 && cur_posy - tar_posy > 0 &&
+				   tar_posx - cur_posx < 32+8 && tar_posx - cur_posx > -32)
 				{
-				lm = !lm;
-				rm = !rm;
+					lm = !lm;
+					rm = !rm;
 				}
-			else if(tar_posx - cur_posx < 4+8 && tar_posx - cur_posx > -4)
+				else if(tar_posx - cur_posx < 4+8 && tar_posx - cur_posx > -4)
 				{      // makes the bunnies less "nervous"
-				lm=0;
-				rm=0;
+					lm=0;
+					rm=0;
 				}
 
 			} else {
@@ -1395,6 +1417,13 @@ void cpu_move(void)
 					lm = 1;
 					rm = 0;
 				}
+			}
+
+			/* Suicide */
+			if (rnearest > 0 && rnearest < ai_personalities[i].suicide_distance) {
+				dm = 1;
+			} else {
+				dm = 0;
 			}
 
 			/* Y-axis movement */
@@ -1531,6 +1560,34 @@ void cpu_move(void)
 				addkey(key | 0x8000);
 				}
 			}
+
+		if (dm) {
+			SDL_Scancode key;
+			if(i == 0)
+				key = KEY_PL1_DOWN;
+			else if(i == 1)
+				key = KEY_PL2_DOWN;
+			else if(i == 2)
+				key = KEY_PL3_DOWN;
+			else
+				key = KEY_PL4_DOWN;
+
+			key &= 0x7f;
+			addkey(key);
+		} else {
+			SDL_Scancode key;
+			if(i == 0)
+				key = KEY_PL1_DOWN;
+			else if(i == 1)
+				key = KEY_PL2_DOWN;
+			else if(i == 2)
+				key = KEY_PL3_DOWN;
+			else
+				key = KEY_PL4_DOWN;
+
+			key &= 0x7f;
+			addkey(key | 0x8000);
+		}
 		}
 }
 
