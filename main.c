@@ -1206,6 +1206,41 @@ tile = ban_map[pos_y][pos_x];
 return tile;
 }
 
+typedef struct {
+	int select_target;
+	int target_timeout;
+	long long nearest_distance;
+} ai_personality_t;
+
+/*
+  Dott is an assassin. Very little will distract it from its prey
+  Jiffy is very easily distracted, and doesn't care much about the game
+  Fizz is just a casual player
+  Mijji is very scared and will choose to run away over fighting (although this isn't implemented yet)
+*/
+ai_personality_t ai_personalities[4] = {
+	{ /* Dott */
+		.select_target = 90,
+		.target_timeout = 6,
+		.nearest_distance = 100000000000000
+	},
+        { /* Jiffy */
+		.select_target = 20,
+		.target_timeout = 1,
+		.nearest_distance = 5000000000000
+	},
+	{ /* Fizz */
+		.select_target = 70,
+		.target_timeout = 2,
+		.nearest_distance = 20000000000000
+	},
+	{ /* Mijji */
+		.select_target = 50,
+		.target_timeout = 0,
+		.nearest_distance = 1000000000000
+	}
+};
+
 #define M_ABS(x) (((x) < 0) ? (-(x)) : (x))
 void cpu_move(void)
 {
@@ -1223,7 +1258,7 @@ void cpu_move(void)
 		nearest_distance = -1;
 		if (ai[i] && player[i].enabled) {		// this player is a computer
 
-			if ((currtime - player[i].ai_target_time) >= 1 ||
+			if ((currtime - player[i].ai_target_time) >= ai_personalities[i].target_timeout ||
 			    player[i].ai_target_time < 0) {
 				player[i].ai_target_time = currtime;
 
@@ -1246,7 +1281,9 @@ void cpu_move(void)
 						deltay = -deltay;
 					players_distance = deltax*deltax + deltay*deltay*2;
 
-					if (((players_distance < nearest_distance) && rnd(10) <= 7) || nearest_distance == -1)
+					if (((players_distance < nearest_distance) &&
+					     rnd(100) <= ai_personalities[i].select_target) ||
+					    nearest_distance == -1)
 					{
 						target = &player[j];
 						target_id = j;
@@ -1299,7 +1336,7 @@ void cpu_move(void)
 			/* here goes the artificial intelligence code */
 
 			if (nearest_distance > 0 &&
-			    nearest_distance < 20000000000000) {
+			    nearest_distance < ai_personalities[i].nearest_distance) {
 
 			/* X-axis movement */
 			if(tar_posx > cur_posx)       // if true target is on the right side
