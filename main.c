@@ -1090,11 +1090,21 @@ static void player_action_left(int c1)
             player[c1].x_add -= 16384;
             if (player[c1].x_add > -98304L && player[c1].in_water == 0 && below == BAN_SOLID)
                 add_object(OBJ_SMOKE, (player[c1].x >> 16) + 2 + rnd(9), (player[c1].y >> 16) + 13 + rnd(5), 0, -16384 - rnd(8192), OBJ_ANIM_SMOKE, 0);
-        } else
-            player[c1].x_add -= 12288;
+        } else {
+		if (!player[c1].in_water || water_state != WATER_STATE_BLOOD)
+			player[c1].x_add -= 12288;
+		else
+			player[c1].x_add -= 4000;
+	}
     }
-    if (player[c1].x_add < -98304L)
-        player[c1].x_add = -98304L;
+
+    if (!player[c1].in_water || water_state != WATER_STATE_BLOOD) {
+	    if (player[c1].x_add < -98304L)
+		    player[c1].x_add = -98304L;
+    } else {
+	    if (player[c1].x_add < -44304L)
+		    player[c1].x_add = -44304L;
+    }
     player[c1].direction = 1;
     if (player[c1].anim == 0) {
         player[c1].anim = 1;
@@ -1131,11 +1141,21 @@ static void player_action_right(int c1)
             player[c1].x_add += 16384;
             if (player[c1].x_add < 98304L && player[c1].in_water == 0 && below == BAN_SOLID)
                 add_object(OBJ_SMOKE, (player[c1].x >> 16) + 2 + rnd(9), (player[c1].y >> 16) + 13 + rnd(5), 0, -16384 - rnd(8192), OBJ_ANIM_SMOKE, 0);
-        } else
-            player[c1].x_add += 12288;
+        } else {
+		if (!player[c1].in_water || water_state != WATER_STATE_BLOOD)
+			player[c1].x_add += 12288;
+		else
+			player[c1].x_add += 4000;
+	}
     }
-    if (player[c1].x_add > 98304L)
-        player[c1].x_add = 98304L;
+
+    if (!player[c1].in_water || water_state != WATER_STATE_BLOOD) {
+	    if (player[c1].x_add > 98304L)
+		    player[c1].x_add = 98304L;
+    } else {
+	    if (player[c1].x_add > 44304L)
+		    player[c1].x_add = 44304L;
+    }
     player[c1].direction = 0;
     if (player[c1].anim == 0) {
         player[c1].anim = 1;
@@ -1699,7 +1719,10 @@ void steer_players(void)
 							}
 						}
 						/* slowly move up to water surface */
-						player[c1].y_add -= 1536;
+						if (water_state == WATER_STATE_WATER)
+							player[c1].y_add -= 1536;
+						else
+							player[c1].y_add -= 500;
 						if (player[c1].y_add < 0 && player[c1].anim != 5) {
 							player[c1].anim = 5;
 							player[c1].frame = 0;
