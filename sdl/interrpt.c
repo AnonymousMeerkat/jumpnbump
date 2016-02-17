@@ -382,6 +382,7 @@ int intr_sysupdate()
 						addkey((KEY_PL1_LEFT & 0x7f) | 0x8000);
 						addkey((KEY_PL1_RIGHT & 0x7f) | 0x8000);
 						addkey((KEY_PL1_JUMP & 0x7f) | 0x8000);
+                                                addkey((KEY_PL1_DOWN & 0x7f) | 0x8000);
 						break;
 					case SDL_SCANCODE_2:
 						if (e.type == SDL_KEYUP)
@@ -391,6 +392,7 @@ int intr_sysupdate()
 						addkey((KEY_PL2_LEFT & 0x7f) | 0x8000);
 						addkey((KEY_PL2_RIGHT & 0x7f) | 0x8000);
 						addkey((KEY_PL2_JUMP & 0x7f) | 0x8000);
+                                                addkey((KEY_PL2_DOWN & 0x7f) | 0x8000);
 						break;
 					case SDL_SCANCODE_3:
 						if (e.type == SDL_KEYUP)
@@ -400,6 +402,7 @@ int intr_sysupdate()
 						addkey((KEY_PL3_LEFT & 0x7f) | 0x8000);
 						addkey((KEY_PL3_RIGHT & 0x7f) | 0x8000);
 						addkey((KEY_PL3_JUMP & 0x7f) | 0x8000);
+                                                addkey((KEY_PL3_DOWN & 0x7f) | 0x8000);
 						break;
 					case SDL_SCANCODE_4:
 						if (e.type == SDL_KEYUP)
@@ -409,6 +412,7 @@ int intr_sysupdate()
 						addkey((KEY_PL4_LEFT & 0x7f) | 0x8000);
 						addkey((KEY_PL4_RIGHT & 0x7f) | 0x8000);
 						addkey((KEY_PL4_JUMP & 0x7f) | 0x8000);
+                                                addkey((KEY_PL4_DOWN & 0x7f) | 0x8000);
 						break;
 					case SDL_SCANCODE_ESCAPE:
 						if (e.type == SDL_KEYUP)

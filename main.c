@@ -1559,36 +1559,36 @@ void cpu_move(void)
 				key &= 0x7f;
 				addkey(key | 0x8000);
 				}
+
+			if (dm) {
+				SDL_Scancode key;
+				if(i == 0)
+					key = KEY_PL1_DOWN;
+				else if(i == 1)
+					key = KEY_PL2_DOWN;
+				else if(i == 2)
+					key = KEY_PL3_DOWN;
+				else
+					key = KEY_PL4_DOWN;
+
+				key &= 0x7f;
+				addkey(key);
+			} else {
+				SDL_Scancode key;
+				if(i == 0)
+					key = KEY_PL1_DOWN;
+				else if(i == 1)
+					key = KEY_PL2_DOWN;
+				else if(i == 2)
+					key = KEY_PL3_DOWN;
+				else
+					key = KEY_PL4_DOWN;
+
+				key &= 0x7f;
+				addkey(key | 0x8000);
 			}
-
-		if (dm) {
-			SDL_Scancode key;
-			if(i == 0)
-				key = KEY_PL1_DOWN;
-			else if(i == 1)
-				key = KEY_PL2_DOWN;
-			else if(i == 2)
-				key = KEY_PL3_DOWN;
-			else
-				key = KEY_PL4_DOWN;
-
-			key &= 0x7f;
-			addkey(key);
-		} else {
-			SDL_Scancode key;
-			if(i == 0)
-				key = KEY_PL1_DOWN;
-			else if(i == 1)
-				key = KEY_PL2_DOWN;
-			else if(i == 2)
-				key = KEY_PL3_DOWN;
-			else
-				key = KEY_PL4_DOWN;
-
-			key &= 0x7f;
-			addkey(key | 0x8000);
 		}
-		}
+	}
 }
 
 
