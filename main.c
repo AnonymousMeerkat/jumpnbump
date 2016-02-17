@@ -1272,6 +1272,7 @@ void cpu_move(void)
 	int target_id = -1;
 	long long nearest_distance = -1, rnearest = -1;
 	int currtime = time(NULL);
+	int currmillis = get_millis();
 
 	for (i = 0; i < JNB_MAX_PLAYERS; i++) {
 		nearest_distance = -1;
@@ -1401,10 +1402,14 @@ void cpu_move(void)
 			} else {
 				int regen = 0;
 				if (player[i].ai_following == -1 ||
-				    cur_posx == player[i].ai_following)
+				    (cur_posx >> 2) == (player[i].ai_following >> 2))
 					regen = 1;
 
-				if (rnd(200) == 1)
+				else if (rnd(200) == 1)
+					regen = 1;
+
+				else if (cur_posx == player[i].ai_spotx &&
+				    (currmillis - player[i].ai_spotx_time) > 700)
 					regen = 1;
 
 				if (regen)
@@ -1417,6 +1422,11 @@ void cpu_move(void)
 					lm = 1;
 					rm = 0;
 				}
+			}
+
+			if (cur_posx != player[i].ai_spotx) {
+				player[i].ai_spotx = cur_posx;
+				player[i].ai_spotx_time = currmillis;
 			}
 
 			/* Suicide */
@@ -1948,6 +1958,8 @@ void position_player(int player_num)
 			player[player_num].ai_last_time = -1;
 			player[player_num].ai_target = -1;
 			player[player_num].ai_target_time = -1;
+			player[player_num].ai_spotx = -1;
+			player[player_num].ai_spotx_time = -1;
 			player[player_num].image = player_anims[player[player_num].anim].frame[player[player_num].frame].image;
 
 			if (is_server) {
