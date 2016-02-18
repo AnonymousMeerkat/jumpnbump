@@ -13,3 +13,5 @@ set(SOURCES
 include_directories(.)
 add_executable(jumpnbump ${SOURCES})
 target_link_libraries(jumpnbump ${LIBRARIES})
+
+install(TARGETS jumpnbump DESTINATION bin)

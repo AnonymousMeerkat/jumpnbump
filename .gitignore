@@ -14,8 +14,6 @@ jnbunpack
 gobpack
 
 # Generated
-jumpbump.dat
-*.gob
 jnbmenu.tcl
 
 # Temp

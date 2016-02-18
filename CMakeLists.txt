@@ -28,3 +28,6 @@ set(LIBRARIES ${LIBRARIES} m ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2NET_LIBR
 
 add_subdirectory(src)
 add_subdirectory(extras)
+
+install(FILES data/jumpbump.dat DESTINATION share/jumpnbump)
+install(FILES jumpnbump.6 DESTINATION share/man/man6)
