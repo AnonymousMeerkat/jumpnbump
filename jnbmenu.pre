@@ -13,7 +13,7 @@ global nosound;
 global mirror;
 global scaleup;
 
-global widget; 
+global widget;
 
 #################################
 # USER DEFINED PROCEDURES
@@ -31,7 +31,7 @@ global fullscreen
 	global mirror
 	global scaleup
 	global nogore
-	
+
 	set str_fullscreen ""
 	if { $fullscreen == 1 } { set str_fullscreen "-fullscreen" }
 	set str_nosound ""
@@ -47,7 +47,7 @@ global fullscreen
 	if { [ .top17.lis26 curselection ] != "" } then {
 		set file "%%PREFIX%%/games/jumpnbump/[ .top17.lis26 get [.top17.lis26 curselection] ].dat"
 	}
-	
+
 	exec jumpnbump $str_fullscreen $str_nosound $str_scaleup $str_mirror $str_nogore -dat $file &
 }
 
@@ -163,57 +163,57 @@ proc vTclWindow.top17 {base} {
     wm deiconify $base
     wm title $base "Jump n Bump"
     label $base.lab18 \
-        -borderwidth 1 -relief raised -text {Jump n Bump} 
+        -borderwidth 1 -relief raised -text {Jump n Bump}
     label $base.lab20 \
-        -borderwidth 1 -relief sunken 
+        -borderwidth 1 -relief sunken
     checkbutton $base.che22 \
-        -text {full screen} -variable fullscreen 
+        -text {full screen} -variable fullscreen
     checkbutton $base.che23 \
-        -text {no sound} -variable nosound 
+        -text {no sound} -variable nosound
     checkbutton $base.che24 \
-        -text {no gore} -variable nogore 
+        -text {no gore} -variable nogore
     checkbutton $base.che28 \
         -text scaleup -variable scaleup
     checkbutton $base.che29 \
         -text mirror -variable mirror
     listbox $base.lis26 \
-        -yscrollcommand {.top17.scr27 set} 
+        -yscrollcommand {.top17.scr27 set}
     bind $base.lis26 <Double-Button-1> {
         exec_file
     }
     scrollbar $base.scr27 \
-        -command {.top17.lis26 yview} 
+        -command {.top17.lis26 yview}
     button $base.but28 \
-        -command { exec_file } -text Start 
+        -command { exec_file } -text Start
     button $base.but29 \
-        -command { exit } -text Quit 
+        -command { exit } -text Quit
     ###################
     # SETTING GEOMETRY
     ###################
     place $base.lab18 \
-        -x 25 -y 10 -width 366 -height 17 -anchor nw -bordermode ignore 
+        -x 25 -y 10 -width 366 -height 17 -anchor nw -bordermode ignore
     place $base.lab20 \
-        -x 190 -y 40 -width 196 -height 257 -anchor nw -bordermode ignore 
+        -x 190 -y 40 -width 196 -height 257 -anchor nw -bordermode ignore
     place $base.che22 \
-        -x 220 -y 54 -anchor nw -bordermode ignore 
+        -x 220 -y 54 -anchor nw -bordermode ignore
     place $base.che23 \
-        -x 220 -y 83 -anchor nw -bordermode ignore 
+        -x 220 -y 83 -anchor nw -bordermode ignore
     place $base.che24 \
-        -x 220 -y 112 -anchor nw -bordermode ignore 
-    place $base.che25 \
-        -x 220 -y 141 -anchor nw -bordermode ignore 
+        -x 220 -y 112 -anchor nw -bordermode ignore
+    #place $base.che25 \
+    #    -x 220 -y 141 -anchor nw -bordermode ignore
     place $base.che28 \
-        -x 220 -y 170 -anchor nw -bordermode ignore 
+        -x 220 -y 170 -anchor nw -bordermode ignore
     place $base.che29 \
-        -x 220 -y 199 -anchor nw -bordermode ignore 
+        -x 220 -y 199 -anchor nw -bordermode ignore
     place $base.lis26 \
-        -x 30 -y 40 -width 103 -height 261 -anchor nw -bordermode ignore 
+        -x 30 -y 40 -width 103 -height 261 -anchor nw -bordermode ignore
     place $base.scr27 \
-        -x 145 -y 40 -width 21 -height 262 -anchor nw -bordermode ignore 
+        -x 145 -y 40 -width 21 -height 262 -anchor nw -bordermode ignore
     place $base.but28 \
-        -x 230 -y 230 -width 117 -height 25 -anchor nw -bordermode ignore 
+        -x 230 -y 230 -width 117 -height 25 -anchor nw -bordermode ignore
     place $base.but29 \
-        -x 230 -y 255 -width 117 -height 25 -anchor nw -bordermode ignore 
+        -x 230 -y 255 -width 117 -height 25 -anchor nw -bordermode ignore
 }
 
 Window show .

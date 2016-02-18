@@ -32,6 +32,7 @@ globals.h: globals.pre
 
 jnbmenu.tcl: jnbmenu.pre
 	sed -e "s#%%PREFIX%%#$(PREFIX)#g" < jnbmenu.pre > jnbmenu.tcl
+	chmod +x jnbmenu.tcl
 
 data: jnbpack
 	cd data && make
