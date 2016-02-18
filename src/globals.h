@@ -57,16 +57,16 @@ extern "C" {
 # include <windows.h>
 # include <sys/stat.h>
 # include <io.h>
-# include "SDL.h"
+# include <SDL2/SDL.h>
 # if USE_SDL_MIXER
-#  include "SDL_mixer.h"
+#  include <SDL2/SDL_mixer.h>
 # endif
 #else
 # ifdef USE_SDL
 #  include <sys/stat.h>
-#  include "SDL.h"
+#  include <SDL2/SDL.h>
 #  if USE_SDL_MIXER
-#   include "SDL_mixer.h"
+#   include <SDL2/SDL_mixer.h>
 #  endif
 # endif
 #endif
@@ -171,13 +171,13 @@ extern int ai[JNB_MAX_PLAYERS];
 #define BAN_SPRING	4
 
 #ifndef DATA_PATH
-#ifdef __APPLE__
-#define	DATA_PATH "data/jumpbump.dat"
-#elif _WIN32
-#define	DATA_PATH "data/jumpbump.dat"
-#else
-#define	DATA_PATH "%%PREFIX%%/share/jumpnbump/jumpbump.dat"
-#endif
+# ifdef __APPLE__
+#  define	DATA_PATH "data/jumpbump.dat"
+# elif _WIN32
+#  define	DATA_PATH "data/jumpbump.dat"
+# else
+#  define	DATA_PATH PREFIX "/share/jumpnbump/jumpbump.dat"
+# endif
 #endif
 
 typedef struct {

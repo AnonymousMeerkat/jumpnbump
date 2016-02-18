@@ -26,7 +26,7 @@
  */
 
 #include "globals.h"
-#include "SDL_endian.h"
+#include <SDL_endian.h>
 #include "filter.h"
 
 #ifdef _MSC_VER

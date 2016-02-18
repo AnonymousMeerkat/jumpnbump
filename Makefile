@@ -38,9 +38,9 @@ data: jnbpack
 	cd data && make
 
 clean:
-	cd sdl && make clean
-	cd modify && make clean
-	cd data && make clean
+	#cd sdl && make clean
+	#cd modify && make clean
+	#cd data && make clean
 	rm -f $(TARGET) *.o globals.h jnbmenu.tcl
 
 install:

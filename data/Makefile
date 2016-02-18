@@ -1,3 +1,4 @@
+EXTRAS ?= ../build/extras
 GOBS = numbers.gob objects.gob rabbit.gob
 DATAFILES = bump.mod calib.dat death.smp fly.smp font.gob jump.mod \
 	jump.smp levelmap.txt level.pcx mask.pcx menu.pcx \
@@ -6,22 +7,19 @@ DATAFILES = bump.mod calib.dat death.smp fly.smp font.gob jump.mod \
 all: jumpbump.dat
 
 font.gob:
-	../gobpack font
+	$(EXTRAS)/gobpack font
 
 rabbit.gob:
-	../gobpack rabbit
+	$(EXTRAS)/gobpack rabbit
 
 numbers.gob:
-	../gobpack numbers
+	$(EXTRAS)/gobpack numbers
 
 objects.gob:
-	../gobpack objects
+	$(EXTRAS)/gobpack objects
 
-jumpbump.dat: $(DATAFILES) ../jnbpack
-	../jnbpack -o jumpbump.dat $(DATAFILES)
-
-../jnbpack:
-	cd ../modify && make
+jumpbump.dat: $(DATAFILES)
+	$(EXTRAS)/jnbpack -o jumpbump.dat $(DATAFILES)
 
 clean:
 	rm -f jumpbump.dat $(GOBS)
