@@ -28,21 +28,14 @@
 #include "globals.h"
 #include <fcntl.h>
 #ifndef _MSC_VER
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 
-#ifdef BZLIB_SUPPORT
-#include "bzlib.h"
-#endif
-
-#ifdef ZLIB_SUPPORT
-#include "zlib.h"
-#endif
-
+#include "io/io.h"
 #include "network.h"
 
 #ifndef M_PI
-#define M_PI		3.14159265358979323846
+#  define M_PI		3.14159265358979323846
 #endif
 
 gob_t rabbit_gobs = { 0 };
@@ -240,20 +233,6 @@ int pogostick, bunnies_in_space, jetpack, lord_of_the_flies, water_state;
 #define WATER_STATE_LAVA 2
 
 int client_player_num = -1;
-
-#ifndef _MSC_VER
-int filelength(int handle)
-{
-	struct stat buf;
-
-	if (fstat(handle, &buf) == -1) {
-		perror("filelength");
-		exit(EXIT_FAILURE);
-	}
-
-	return buf.st_size;
-}
-#endif
 
 
 static void flip_pixels(unsigned char *pixels)
@@ -2544,129 +2523,8 @@ unsigned char *datafile_buffer = NULL;
 
 static void preread_datafile(const char *fname)
 {
-    int fd = 0;
-    int len;
-
-#ifdef ZLIB_SUPPORT
-    char *gzfilename;
-    gzFile gzf;
-#endif
-
-#ifdef BZLIB_SUPPORT
-    char *bzfilename;
-    BZFILE *bzf;
-#endif
-
-#ifdef BZLIB_SUPPORT
-    bzfilename = malloc(strlen(fname) + 5);
-    strcpy(bzfilename, fname);
-    strcat(bzfilename, ".bz2");
-    bzf = BZ2_bzopen(bzfilename, "rb");
-    free(bzfilename);
-    bzfilename = NULL;
-
-    if (bzf != NULL) {
-        int bufsize = 0;
-        int bufpos = 0;
-        int br;
-        unsigned char *ptr;
-        do {
-            if (bufpos >= bufsize) {
-                bufsize += 1024 * 1024;
-                datafile_buffer = (unsigned char *) realloc(datafile_buffer, bufsize);
-                if (datafile_buffer == NULL) {
-                    perror("realloc()");
-                    exit(42);
-                }
-            }
-
-            br = BZ2_bzread(bzf, datafile_buffer + bufpos, bufsize - bufpos);
-            if (br == -1) {
-                fprintf(stderr, "gzread failed.\n");
-                exit(42);
-            }
-
-            bufpos += br;
-        } while (br>0);
-
-        /* try to shrink buffer... */
-        ptr = (unsigned char *) realloc(datafile_buffer, bufpos);
-        if (ptr != NULL)
-            datafile_buffer = ptr;
-
-        BZ2_bzclose(bzf);
-        return;
-    }
-
-    /* drop through and try for an gzip compressed or uncompressed datafile... */
-#endif
-
-#ifdef ZLIB_SUPPORT
-    gzfilename = malloc(strlen(fname) + 4);
-    strcpy(gzfilename, fname);
-    strcat(gzfilename, ".gz");
-    gzf = gzopen(gzfilename, "rb");
-    free(gzfilename);
-    gzfilename = NULL;
-
-    if (gzf != NULL) {
-        int bufsize = 0;
-        int bufpos = 0;
-        unsigned char *ptr;
-        do {
-            int br;
-            if (bufpos >= bufsize) {
-                bufsize += 1024 * 1024;
-                datafile_buffer = (unsigned char *) realloc(datafile_buffer, bufsize);
-                if (datafile_buffer == NULL) {
-                    perror("realloc()");
-                    exit(42);
-                }
-            }
-
-            br = gzread(gzf, datafile_buffer + bufpos, bufsize - bufpos);
-            if (br == -1) {
-                fprintf(stderr, "gzread failed.\n");
-                exit(42);
-            }
-
-            bufpos += br;
-        } while (!gzeof(gzf));
-
-        /* try to shrink buffer... */
-        ptr = (unsigned char *) realloc(datafile_buffer, bufpos);
-        if (ptr != NULL)
-            datafile_buffer = ptr;
-
-        gzclose(gzf);
-        return;
-    }
-
-    /* drop through and try for an uncompressed datafile... */
-#endif
-
-    fd = open(fname, O_RDONLY | O_BINARY);
-    if (fd == -1) {
-        fprintf(stderr, "can't open %s:", fname);
-	perror("");
-        exit(42);
-    }
-
-    len = filelength(fd);
-    datafile_buffer = (unsigned char *) malloc(len);
-    if (datafile_buffer == NULL) {
-        perror("malloc()");
-        close(fd);
-        exit(42);
-    }
-
-    if (read(fd, datafile_buffer, len) != len) {
-        perror("read()");
-        close(fd);
-        exit(42);
-    }
-
-    close(fd);
+  if (jnb_io_read((char*)fname, (char**)&datafile_buffer))
+    exit(42);
 }
 
 

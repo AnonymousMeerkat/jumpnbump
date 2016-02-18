@@ -1,4 +1,6 @@
 set(SOURCES
+  io/io_read.c
+
   sdl/gfx.c
   sdl/input.c
   sdl/interrpt.c
