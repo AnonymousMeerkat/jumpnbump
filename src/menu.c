@@ -575,7 +575,7 @@ int menu_init(void)
 
 	fillpalette(0, 0, 0);
 
-	if ((handle = dat_open("menu.pcx")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "menu.pcx")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'menu.pcx', aborting...\n");
 		return 1;
 	}
@@ -583,7 +583,7 @@ int menu_init(void)
 		strcpy(main_info.error_str, "Error loading 'menu.pcx', aborting...\n");
 		return 1;
 	}
-	if ((handle = dat_open("menumask.pcx")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "menumask.pcx")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'menumask.pcx', aborting...\n");
 		return 1;
 	}

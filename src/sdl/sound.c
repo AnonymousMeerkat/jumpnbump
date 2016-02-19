@@ -1,7 +1,7 @@
 /*
  * sound.c
  * Copyright (C) 1998 Brainchild Design - http://brainchilddesign.com/
- * 
+ *
  * Copyright (C) 2001 Chuck Mason <cemason@users.sourceforge.net>
  *
  * Copyright (C) 2002 Florian Schulze <crow@icculus.org>
@@ -26,12 +26,12 @@
 #include "globals.h"
 #include <limits.h>
 #ifndef _MSC_VER
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 #include "SDL.h"
 
 #ifndef NO_SDL_MIXER
-#include "SDL_mixer.h"
+#  include "SDL_mixer.h"
 
 static Mix_Music *current_music = (Mix_Music *) NULL;
 #endif
@@ -99,7 +99,7 @@ int addsfx(signed short *data, int len, int loop, int samplerate, int channel)
 	/* Set pointer to raw data. */
 	channelinfo[channel].data = data;
 	channelinfo[channel].startdata = data;
-      
+
 	/* Set pointer to end of raw data. */
 	channelinfo[channel].enddata = channelinfo[channel].data + len - 1;
 	channelinfo[channel].samplerate = samplerate;
@@ -126,19 +126,19 @@ static void updateSoundParams(int slot, int volume)
 	channelinfo[slot].step = ((channelinfo[slot].samplerate<<16)/audio_rate);
 
 	leftvol = volume;
-	rightvol= volume;  
+	rightvol= volume;
 
 	/* Sanity check, clamp volume. */
 	if (rightvol < 0)
 		rightvol = 0;
 	if (rightvol > 127)
 		rightvol = 127;
-    
+
 	if (leftvol < 0)
 		leftvol = 0;
 	if (leftvol > 127)
 		leftvol = 127;
-    
+
 	channelinfo[slot].leftvol = leftvol;
 	channelinfo[slot].rightvol = rightvol;
 }
@@ -216,7 +216,7 @@ void mix_sound(void *unused, Uint8 *stream, int len)
 				}
 			}
 		}
-  
+
 		/* Clamp to range. Left hardware channel. */
 		/* Has been char instead of short. */
 		/* if (dl > 127) *leftout = 127; */
@@ -426,7 +426,7 @@ char dj_load_sfx(unsigned char * file_handle, char *filename, int file_length, c
 	unsigned int i;
 	unsigned char *src;
 	unsigned short *dest;
-	
+
 	if (main_info.no_sound)
 		return 0;
 
@@ -476,17 +476,17 @@ char dj_ready_mod(char mod_num)
 
 	switch (mod_num) {
 	case MOD_MENU:
-		fp = dat_open("jump.mod");
-		len = dat_filelen("jump.mod");
-		break;
+          fp = jnb_dat_open(&datafile, "jump.mod");
+          len = jnb_dat_filelen(&datafile, "jump.mod");
+          break;
 	case MOD_GAME:
-		fp = dat_open("bump.mod");
-		len = dat_filelen("bump.mod");
-		break;
+          fp = jnb_dat_open(&datafile, "bump.mod");
+          len = jnb_dat_filelen(&datafile, "bump.mod");
+          break;
 	case MOD_SCORES:
-		fp = dat_open("scores.mod");
-		len = dat_filelen("scores.mod");
-		break;
+          fp = jnb_dat_open(&datafile, "scores.mod");
+          len = jnb_dat_filelen(&datafile, "scores.mod");
+          break;
 	default:
 		fprintf(stderr, "bogus parameter to dj_ready_mod()\n");
 		fp = NULL;

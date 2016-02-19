@@ -30,9 +30,15 @@
 
 #ifdef __cplusplus
 extern "C" {
+
+#if 0 /* emacs */
+}
+#endif
+
 #endif
 
 #include "config.h"
+#include "dat/dat.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -261,6 +267,7 @@ extern object_t objects[NUM_OBJECTS];
 extern joy_t joy;
 extern mouse_t mouse;
 
+extern struct jnb_dat_t datafile;
 extern char datfile_name[2048];
 
 extern unsigned char *background_pic;

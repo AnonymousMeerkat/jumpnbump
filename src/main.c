@@ -32,6 +32,7 @@
 #endif
 
 #include "io/io.h"
+#include "dat/dat.h"
 #include "network.h"
 
 #ifndef M_PI
@@ -51,6 +52,7 @@ joy_t joy;
 mouse_t mouse;
 
 char datfile_name[2048];
+struct jnb_dat_t datafile;
 
 unsigned char *background_pic;
 unsigned char *mask_pic;
@@ -971,7 +973,7 @@ static int menu_loop(void)
 
 		flippage(main_info.view_page);
 
-		if ((handle = dat_open("menu.pcx")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "menu.pcx")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'menu.pcx', aborting...\n");
 			return 1;
 		}
@@ -2422,7 +2424,7 @@ int init_level(int level, char *pal)
 	int c1, c2;
 	int s1, s2;
 
-	if ((handle = dat_open("level.pcx")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "level.pcx")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'level.pcx', aborting...\n");
 		return 1;
 	}
@@ -2432,7 +2434,7 @@ int init_level(int level, char *pal)
 	}
 	if (flip)
 		flip_pixels(background_pic);
-	if ((handle = dat_open("mask.pcx")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "mask.pcx")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'mask.pcx', aborting...\n");
 		return 1;
 	}
@@ -2523,7 +2525,7 @@ unsigned char *datafile_buffer = NULL;
 
 static void preread_datafile(const char *fname)
 {
-  if (jnb_io_read((char*)fname, (char**)&datafile_buffer))
+  if (jnb_dat_read((char*)fname, &datafile))
     exit(42);
 }
 
@@ -2674,7 +2676,7 @@ all provided the user didn't choose one on the commandline. */
 		}
 	}
 
-	if ((handle = dat_open("menu.pcx")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "menu.pcx")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'menu.pcx', aborting...\n");
 		return 1;
 	}
@@ -2683,38 +2685,38 @@ all provided the user didn't choose one on the commandline. */
 		return 1;
 	}
 
-	if ((handle = dat_open("rabbit.gob")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "rabbit.gob")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'rabbit.gob', aborting...\n");
 		return 1;
 	}
-	if (register_gob(handle, &rabbit_gobs, dat_filelen("rabbit.gob"))) {
+	if (register_gob(handle, &rabbit_gobs, jnb_dat_filelen(&datafile, "rabbit.gob"))) {
 		/* error */
 		return 1;
 	}
 
-	if ((handle = dat_open("objects.gob")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "objects.gob")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'objects.gob', aborting...\n");
 		return 1;
 	}
-	if (register_gob(handle, &object_gobs, dat_filelen("objects.gob"))) {
+	if (register_gob(handle, &object_gobs, jnb_dat_filelen(&datafile, "objects.gob"))) {
 		/* error */
 		return 1;
 	}
 
-	if ((handle = dat_open("font.gob")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "font.gob")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'font.gob', aborting...\n");
 		return 1;
 	}
-	if (register_gob(handle, &font_gobs, dat_filelen("font.gob"))) {
+	if (register_gob(handle, &font_gobs, jnb_dat_filelen(&datafile, "font.gob"))) {
 		/* error */
 		return 1;
 	}
 
-	if ((handle = dat_open("numbers.gob")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "numbers.gob")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'numbers.gob', aborting...\n");
 		return 1;
 	}
-	if (register_gob(handle, &number_gobs, dat_filelen("numbers.gob"))) {
+	if (register_gob(handle, &number_gobs, jnb_dat_filelen(&datafile, "numbers.gob"))) {
 		/* error */
 		return 1;
 	}
@@ -2737,7 +2739,7 @@ all provided the user didn't choose one on the commandline. */
 		dj_set_nosound(1);
 		dj_start();
 
-		if ((handle = dat_open("jump.mod")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "jump.mod")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'jump.mod', aborting...\n");
 			return 1;
 		}
@@ -2746,7 +2748,7 @@ all provided the user didn't choose one on the commandline. */
 			return 1;
 		}
 
-		if ((handle = dat_open("bump.mod")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "bump.mod")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'bump.mod', aborting...\n");
 			return 1;
 		}
@@ -2755,7 +2757,7 @@ all provided the user didn't choose one on the commandline. */
 			return 1;
 		}
 
-		if ((handle = dat_open("scores.mod")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "scores.mod")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'scores.mod', aborting...\n");
 			return 1;
 		}
@@ -2764,47 +2766,47 @@ all provided the user didn't choose one on the commandline. */
 			return 1;
 		}
 
-		if ((handle = dat_open("jump.smp")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "jump.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'jump.smp', aborting...\n");
 			return 1;
 		}
-		if (dj_load_sfx(handle, 0, dat_filelen("jump.smp"), DJ_SFX_TYPE_SMP, SFX_JUMP) != 0) {
+		if (dj_load_sfx(handle, 0, jnb_dat_filelen(&datafile, "jump.smp"), DJ_SFX_TYPE_SMP, SFX_JUMP) != 0) {
 			strcpy(main_info.error_str, "Error loading 'jump.smp', aborting...\n");
 			return 1;
 		}
 
-		if ((handle = dat_open("death.smp")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "death.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'death.smp', aborting...\n");
 			return 1;
 		}
-		if (dj_load_sfx(handle, 0, dat_filelen("death.smp"), DJ_SFX_TYPE_SMP, SFX_DEATH) != 0) {
+		if (dj_load_sfx(handle, 0, jnb_dat_filelen(&datafile, "death.smp"), DJ_SFX_TYPE_SMP, SFX_DEATH) != 0) {
 			strcpy(main_info.error_str, "Error loading 'death.smp', aborting...\n");
 			return 1;
 		}
 
-		if ((handle = dat_open("spring.smp")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "spring.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'spring.smp', aborting...\n");
 			return 1;
 		}
-		if (dj_load_sfx(handle, 0, dat_filelen("spring.smp"), DJ_SFX_TYPE_SMP, SFX_SPRING) != 0) {
+		if (dj_load_sfx(handle, 0, jnb_dat_filelen(&datafile, "spring.smp"), DJ_SFX_TYPE_SMP, SFX_SPRING) != 0) {
 			strcpy(main_info.error_str, "Error loading 'spring.smp', aborting...\n");
 			return 1;
 		}
 
-		if ((handle = dat_open("splash.smp")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "splash.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'splash.smp', aborting...\n");
 			return 1;
 		}
-		if (dj_load_sfx(handle, 0, dat_filelen("splash.smp"), DJ_SFX_TYPE_SMP, SFX_SPLASH) != 0) {
+		if (dj_load_sfx(handle, 0, jnb_dat_filelen(&datafile, "splash.smp"), DJ_SFX_TYPE_SMP, SFX_SPLASH) != 0) {
 			strcpy(main_info.error_str, "Error loading 'splash.smp', aborting...\n");
 			return 1;
 		}
 
-		if ((handle = dat_open("fly.smp")) == 0) {
+		if ((handle = jnb_dat_open(&datafile, "fly.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'fly.smp', aborting...\n");
 			return 1;
 		}
-		if (dj_load_sfx(handle, 0, dat_filelen("fly.smp"), DJ_SFX_TYPE_SMP, SFX_FLY) != 0) {
+		if (dj_load_sfx(handle, 0, jnb_dat_filelen(&datafile, "fly.smp"), DJ_SFX_TYPE_SMP, SFX_FLY) != 0) {
 			strcpy(main_info.error_str, "Error loading 'fly.smp', aborting...\n");
 			return 1;
 		}
@@ -2892,7 +2894,7 @@ all provided the user didn't choose one on the commandline. */
 			}
 		}
 		if (load_flag == 1) {
-			if ((handle = dat_open("calib.dat")) == 0) {
+                  if ((handle = jnb_dat_open(&datafile, "calib.dat")) == 0) {
 				strcpy(main_info.error_str, "Error loading 'calib.dat', aborting...\n");
 				return 1;
 			}
@@ -2975,7 +2977,7 @@ int read_level(void)
 	int c1, c2;
 	int chr;
 
-	if ((handle = dat_open("levelmap.txt")) == 0) {
+	if ((handle = jnb_dat_open(&datafile, "levelmap.txt")) == 0) {
 		strcpy(main_info.error_str, "Error loading 'levelmap.txt', aborting...\n");
 		return 1;
 	}
@@ -2999,85 +3001,6 @@ int read_level(void)
 
 	return 0;
 
-}
-
-
-unsigned char *dat_open(char *file_name)
-{
-	int num;
-	int c1;
-	char name[21];
-	int ofs;
-	unsigned char *ptr;
-
-	if (datafile_buffer == NULL)
-		return 0;
-
-	memset(name, 0, sizeof(name));
-
-	num = ( (datafile_buffer[0] <<  0) +
-	        (datafile_buffer[1] <<  8) +
-	        (datafile_buffer[2] << 16) +
-	        (datafile_buffer[3] << 24) );
-
-	ptr = datafile_buffer + 4;
-
-	for (c1 = 0; c1 < num; c1++) {
-
-		memcpy(name, ptr, 12);
-		ptr += 12;
-
-		if (strnicmp(name, file_name, strlen(file_name)) == 0) {
-			ofs = ( (ptr[0] <<  0) +
-				(ptr[1] <<  8) +
-				(ptr[2] << 16) +
-				(ptr[3] << 24) );
-
-			return (datafile_buffer + ofs);
-		}
-		ptr += 8;
-	}
-
-	return 0;
-}
-
-
-int dat_filelen(char *file_name)
-{
-	unsigned char *ptr;
-	int num;
-	int c1;
-	char name[21];
-	int len;
-
-	memset(name, 0, sizeof(name));
-
-	num = ( (datafile_buffer[0] <<  0) +
-	        (datafile_buffer[1] <<  8) +
-	        (datafile_buffer[2] << 16) +
-	        (datafile_buffer[3] << 24) );
-
-	ptr = datafile_buffer + 4;
-
-	for (c1 = 0; c1 < num; c1++) {
-
-	        memcpy(name, ptr, 12);
-		ptr += 12;
-
-		if (strnicmp(name, file_name, strlen(file_name)) == 0) {
-
-			ptr += 4;
-			len = ( (ptr[0] <<  0) +
-				(ptr[1] <<  8) +
-				(ptr[2] << 16) +
-				(ptr[3] << 24) );
-
-			return len;
-		}
-		ptr += 8;
-	}
-
-	return 0;
 }
 
 
