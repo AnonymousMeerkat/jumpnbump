@@ -701,11 +701,7 @@ static void game_loop(void) {
 
 			steer_players();
 
-			dj_mix();
-
 			collision_check();
-
-			dj_mix();
 
 			main_info.page_info[main_info.draw_page].num_pobs = 0;
 			for (i = 0; i < JNB_MAX_PLAYERS; i++) {
@@ -715,13 +711,9 @@ static void game_loop(void) {
 
 			update_objects();
 
-			dj_mix();
-
 			if (flies_enabled) {
 				update_flies(update_count);
 			}
-
-			dj_mix();
 
 		drawme:
 			if (update_count == 1) {
@@ -740,8 +732,6 @@ static void game_loop(void) {
 				draw_begin();
 
 				draw_pobs(main_info.draw_page);
-
-				dj_mix();
 
 				if (flies_enabled)
 					draw_flies(main_info.draw_page);
@@ -897,8 +887,6 @@ static int menu_loop(void)
 		if (flies_enabled)
 			dj_play_sfx(SFX_FLY, SFX_FLY_FREQ, 0, 0, 0, 4);
 
-		dj_set_nosound(0);
-
 		lord_of_the_flies = bunnies_in_space = jetpack = pogostick = water_state = 0;
 		main_info.page_info[0].num_pobs = 0;
 		main_info.page_info[1].num_pobs = 0;
@@ -997,7 +985,6 @@ static int menu_loop(void)
 		dj_ready_mod(MOD_SCORES);
 		dj_set_mod_volume((char)mod_vol);
 		dj_start_mod();
-		dj_set_nosound(0);
 
 		while (key_pressed(1) == 0) {
 			if (mod_vol < 35)
@@ -1007,14 +994,12 @@ static int menu_loop(void)
 				if (cur_pal[c1] < pal[c1])
 					cur_pal[c1]++;
 			}
-			dj_mix();
 			intr_sysupdate();
 			wait_vrt(0);
 			setpalette(0, 256, cur_pal);
 			flippage(main_info.view_page);
 		}
 		while (key_pressed(1) == 1) {
-			dj_mix();
 			intr_sysupdate();
 		}
 
@@ -1027,7 +1012,6 @@ static int menu_loop(void)
 				if (cur_pal[c1] > pal[c1])
 					cur_pal[c1]--;
 			}
-			dj_mix();
 			wait_vrt(0);
 			setpalette(0, 256, cur_pal);
 			flippage(main_info.view_page);
@@ -1035,7 +1019,6 @@ static int menu_loop(void)
 
 		fillpalette(0, 0, 0);
 
-		dj_set_nosound(1);
 		dj_stop_mod();
 
 		if (is_net)
@@ -2509,7 +2492,6 @@ int init_level(int level, char *pal)
 
 void deinit_level(void)
 {
-	dj_set_nosound(1);
 	dj_stop_mod();
 }
 
@@ -2729,42 +2711,8 @@ all provided the user didn't choose one on the commandline. */
 	dj_init();
 
 	if (main_info.no_sound == 0) {
-		dj_autodetect_sd();
-		dj_set_mixing_freq(20000);
-		dj_set_stereo(0);
-		dj_set_auto_mix(0);
-		dj_set_dma_time(8);
 		dj_set_num_sfx_channels(5);
 		dj_set_sfx_volume(64);
-		dj_set_nosound(1);
-		dj_start();
-
-		if ((handle = jnb_dat_open(&datafile, "jump.mod")) == 0) {
-			strcpy(main_info.error_str, "Error loading 'jump.mod', aborting...\n");
-			return 1;
-		}
-		if (dj_load_mod(handle, 0, MOD_MENU) != 0) {
-			strcpy(main_info.error_str, "Error loading 'jump.mod', aborting...\n");
-			return 1;
-		}
-
-		if ((handle = jnb_dat_open(&datafile, "bump.mod")) == 0) {
-			strcpy(main_info.error_str, "Error loading 'bump.mod', aborting...\n");
-			return 1;
-		}
-		if (dj_load_mod(handle, 0, MOD_GAME) != 0) {
-			strcpy(main_info.error_str, "Error loading 'bump.mod', aborting...\n");
-			return 1;
-		}
-
-		if ((handle = jnb_dat_open(&datafile, "scores.mod")) == 0) {
-			strcpy(main_info.error_str, "Error loading 'scores.mod', aborting...\n");
-			return 1;
-		}
-		if (dj_load_mod(handle, 0, MOD_SCORES) != 0) {
-			strcpy(main_info.error_str, "Error loading 'scores.mod', aborting...\n");
-			return 1;
-		}
 
 		if ((handle = jnb_dat_open(&datafile, "jump.smp")) == 0) {
 			strcpy(main_info.error_str, "Error loading 'jump.smp', aborting...\n");
@@ -2927,9 +2875,6 @@ void deinit_program(void)
 	__dpmi_regs regs;
 #endif
 
-	dj_stop();
-	dj_free_mod(MOD_MENU);
-	dj_free_mod(MOD_GAME);
 	dj_free_sfx(SFX_DEATH);
 	dj_free_sfx(SFX_SPRING);
 	dj_free_sfx(SFX_SPLASH);

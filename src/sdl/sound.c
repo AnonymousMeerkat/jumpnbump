@@ -303,47 +303,6 @@ void dj_deinit(void)
 	SDL_Quit();
 }
 
-void dj_start(void)
-{
-}
-
-void dj_stop(void)
-{
-}
-
-char dj_autodetect_sd(void)
-{
-	return 0;
-}
-
-char dj_set_stereo(char flag)
-{
-	return 0;
-}
-
-void dj_set_auto_mix(char flag)
-{
-}
-
-unsigned short dj_set_mixing_freq(unsigned short freq)
-{
-	return freq;
-}
-
-void dj_set_dma_time(unsigned short time)
-{
-}
-
-void dj_set_nosound(char flag)
-{
-}
-
-/* mix handling */
-
-void dj_mix(void)
-{
-}
-
 /* sfx handling */
 
 char dj_set_num_sfx_channels(char num_channels)
@@ -556,13 +515,4 @@ void dj_set_mod_volume(char volume)
 
 	Mix_VolumeMusic(volume);
 #endif
-}
-
-char dj_load_mod(unsigned char * file_handle, char *filename, char mod_num)
-{
-	return 0;
-}
-
-void dj_free_mod(char mod_num)
-{
 }
