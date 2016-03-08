@@ -19,29 +19,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __JNB__IO_H__
-#define __JNB__IO_H__
-
-#include <stddef.h> /* size_t */
-
-/* Compatibility */
-#ifndef _MSC_VER
-int filelength(int handle);
-#endif
-
-#ifndef   O_BINARY
-#  define O_BINARY 0
-#endif
-
-#define JNB_IO_EXISTS_FILE  1
-#define JNB_IO_EXISTS_DIR   2
-#define JNB_IO_EXISTS_OTHER 3
-
-int jnb_io_exists(char* filename);
-int jnb_io_read(char* in_filename, char** out_data);
-
-int jnb_io_write(char* filename, char* data, size_t data_size);
-int jnb_io_mkdir(char* filename);
+#include "io.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 
-#endif
+int jnb_io_write(char* filename, char* data, size_t data_size)
+{
+  int fd = open(filename, O_RDWR | O_CREAT | O_BINARY, 0644);
+
+  if (!fd)
+    {
+      perror("open()");
+      return -1;
+    }
+
+  write(fd, data, data_size);
+  close(fd);
+
+  return 0;
+}
+
+
+int jnb_io_mkdir(char* filename)
+{
+  if (mkdir(filename, 0755))
+    {
+      perror("mkdir()");
+      return -1;
+    }
+
+  return 0;
+}

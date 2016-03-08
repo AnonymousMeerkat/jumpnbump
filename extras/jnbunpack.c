@@ -1,7 +1,7 @@
 /*
  * unpack.c
  * Copyright (C) 1998 Brainchild Design - http://brainchilddesign.com/
- * 
+ *
  * Copyright (C) 2001 "timecop" <timecop@japan.co.jp>
  *
  * Copyright (C) 2002 Florian Schulze <crow@icculus.org>
@@ -25,78 +25,140 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <string.h>
-#include <sys/types.h>
-#ifndef _MSC_VER
 #include <unistd.h>
-#else
-#include <io.h>
-#endif
+#include "io/io.h"
+#include "dat/dat.h"
 
-typedef struct {
-    char filename[12];
-    unsigned int offset;
-    unsigned int size;
-} DirEntry;
-
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
-
-int main(int argc, char **argv)
+void usage(char* argv0)
 {
-    int fd;
-    DirEntry *datafile;
-    int num_entries, i;
+  printf("usage: %s [-l] file.dat [-o output]\n", argv0);
+}
 
-    if (argc < 2) {
-	printf("dumbass, specify filename to unpack\n");
-	exit(1);
+void list_files(struct jnb_dat_t* dat)
+{
+  int i;
+  int32_t total_size = 0;
+  struct jnb_dat_entry_t entry;
+
+
+  printf("  Length    Name\n---------   ----\n");
+
+
+  for (i = 0; i < dat->entries_length; i++)
+    {
+      entry = dat->entries[i];
+
+      total_size += entry.size;
+
+      printf("%*d   %s\n", 9, entry.size, entry.filename);
     }
 
-    fd = open(argv[1], O_RDONLY | O_BINARY);
-    if (fd == -1) {
-	perror("open datafile");
-	exit(1);
+
+  printf("---------   -------\n%*d   %d file(s)\n", 9, total_size,
+         dat->entries_length);
+}
+
+int extract_files(char* output, struct jnb_dat_t* dat)
+{
+  int i;
+  char out_filename[4096];
+  struct jnb_dat_entry_t entry;
+
+
+  if (jnb_io_exists(output) != JNB_IO_EXISTS_DIR)
+    if (jnb_io_mkdir(output))
+      return -1;
+
+
+  printf("Output directory:  %s\n", output);
+
+
+  for (i = 0; i < dat->entries_length; i++)
+    {
+      entry = dat->entries[i];
+
+      strcpy(out_filename, output);
+      strcat(out_filename, "/");
+      strcat(out_filename, entry.filename);
+
+      printf("%*s %s\n", 11, "creating:", out_filename);
+
+      jnb_io_write(out_filename, (char*)entry.contents, entry.size);
     }
-    /* get number of entries */
-    read(fd, &num_entries, 4);
 
-    printf("%d entries in datafile\n", num_entries);
+  return 0;
+}
 
-    datafile = calloc(num_entries, sizeof(DirEntry));
-    read(fd, datafile, num_entries * sizeof(DirEntry));
-    printf("Directory Listing:\n");
-    for (i = 0; i < num_entries; i++) {
-	char filename[14];
-	memset(filename, 0, sizeof(filename));
-	strncpy(filename, datafile[i].filename, 12);
-	printf("%02d:\t%s (%u bytes)\n", i, filename,
-		datafile[i].size);
+int main(int argc, char** argv)
+{
+  int c;
+  int list_flag = 0;
+  char* file = NULL;
+  char* output = ".";
+  struct jnb_dat_t dat;
+
+  /*** Parse arguments ***/
+
+  while ((c = getopt(argc, argv, "hlo:")) != -1)
+    switch (c)
+      {
+      case 'h':
+        /* Help */
+        usage(argv[0]);
+        return 0;
+
+      case 'l':
+        /* List files */
+        list_flag = 1;
+        break;
+
+      case 'o':
+        /* Output directory */
+        output = optarg;
+        break;
+
+      case '?':
+        /* Unknown option */
+        fprintf(stderr, "Unknown option `%c'.\n", optopt);
+        usage(argv[0]);
+        return -1;
+      }
+
+  if (optind < argc)
+      file = argv[optind];
+
+
+  /*** Run ***/
+
+  /* Check if file is valid */
+  if (!file)
+    {
+      usage(argv[0]);
+      return 0;
     }
+  else
+    file = realpath(file, NULL);
 
-    for (i = 0; i < num_entries; i++) {
-	int outfd;
-	char filename[14];
-	char *buf;
-	memset(filename, 0, sizeof(filename));
-	strncpy(filename, datafile[i].filename, 12);
-	printf("Extracting %s ", filename);
 
-	outfd = open(filename, O_RDWR | O_CREAT | O_BINARY, 0644);
-	if (!outfd) {
-	    perror("cant open file");
-	    exit(1);
-	}
-	lseek(fd, datafile[i].offset, SEEK_SET);
-	buf = calloc(1, datafile[i].size + 16);
-	read(fd, buf, datafile[i].size);
-	write(outfd, buf, datafile[i].size);
-	close(outfd);
-	free(buf);
-	printf("OK\n");
-    }
-    close(fd);
-    return 0;
+  /* Print header */
+  printf("Archive:  %s\n",
+         file);
+
+
+  /* Read */
+  if (jnb_dat_read(file, &dat))
+    return -2;
+
+
+  /* Do the requested operation */
+  if (list_flag)
+    list_files(&dat);
+  else
+    if (extract_files(output, &dat))
+      return -3;
+
+  /* Free */
+  jnb_dat_free(&dat);
+  free(file);
 }

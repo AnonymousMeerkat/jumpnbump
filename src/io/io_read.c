@@ -52,6 +52,25 @@ int filelength(int handle)
 #endif
 
 
+int jnb_io_exists(char* filename)
+{
+  struct stat s;
+
+  if (stat(filename, &s))
+    return -1;
+
+  switch (s.st_mode & S_IFMT)
+    {
+    case S_IFREG:
+      return JNB_IO_EXISTS_FILE;
+    case S_IFDIR:
+      return JNB_IO_EXISTS_DIR;
+    default:
+      return JNB_IO_EXISTS_OTHER;
+    }
+}
+
+
 int jnb_io_read_bz2(char* in_filename, char** out_data)
 {
 #ifdef BZLIB_SUPPORT
@@ -184,11 +203,8 @@ int jnb_io_read_raw(char* in_filename, char** out_data)
 {
   int fd, len;
 
-#ifdef _WIN32
   fd = open(in_filename, O_RDONLY | O_BINARY);
-#else
-  fd = open(in_filename, O_RDONLY);
-#endif
+
   if (fd == -1)
     {
       fprintf(stderr, "can't open %s: ", in_filename);

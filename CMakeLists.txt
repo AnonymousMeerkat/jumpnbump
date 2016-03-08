@@ -26,6 +26,8 @@ find_package(ZLIB REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2MIXER_INCLUDE_DIR} ${SDL2NET_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} m ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2NET_LIBRARY} ${BZIP2_LIBRARIES} ${ZLIB_LIBRARY})
 
+include_directories(src)
+
 add_subdirectory(src)
 add_subdirectory(extras)
 
